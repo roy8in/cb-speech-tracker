@@ -53,15 +53,8 @@ class BOEScraper(BaseScraper):
             if year and date and not date.startswith(str(year)):
                 continue
 
-            # Extract speaker from title (Format: "Speaker Name: Title" or "Speaker Name − Title")
-            speaker = None
-            for sep in [':', '−', '—', '-']:
-                if sep in title:
-                    potential_speaker = title.split(sep)[0].strip()
-                    # Names are usually 2-4 words and don't contain verbs like 'at' or 'to'
-                    if 1 < len(potential_speaker.split()) < 5 and not any(w in potential_speaker.lower() for w in ['at', 'the', 'meeting']):
-                        speaker = potential_speaker
-                        break
+            # Advanced Speaker Extraction
+            speaker = self.extract_speaker_from_title(title)
 
             speeches.append({
                 'title': title,
@@ -78,6 +71,33 @@ class BOEScraper(BaseScraper):
                 unique.append(s)
 
         return unique
+
+    @staticmethod
+    def extract_speaker_from_title(title):
+        """
+        Extract speaker name from BOE title using common patterns.
+        """
+        # Clean title from (pdf ...) info
+        clean_title = re.sub(r'\(pdf\s*.*\)', '', title, flags=re.IGNORECASE).strip()
+        
+        # Pattern 1: Title [dash] speech/remarks/slides by Name
+        m = re.search(r'.+[−–-]\s*(?:speech|remarks|slides|panel remarks|address)\s+by\s+([^−–-]+)$', clean_title, re.IGNORECASE)
+        if m:
+            return m.group(1).strip()
+            
+        # Pattern 2: Name: Title
+        if ':' in clean_title:
+            potential = clean_title.split(':')[0].strip()
+            # Names are usually 2-4 words
+            if 1 < len(potential.split()) < 5 and not any(w in potential.lower() for w in ['at', 'the', 'meeting', 'update']):
+                return potential
+                
+        # Pattern 3: Slides from Name's ...
+        m = re.search(r'Slides\s+from\s+([^’\']+)[’\']s', clean_title, re.IGNORECASE)
+        if m:
+            return m.group(1).strip()
+            
+        return None
 
     def _extract_date_from_url(self, href, default_year):
         """Extract date from BOE URL patterns."""
