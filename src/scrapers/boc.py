@@ -66,8 +66,13 @@ class BOCScraper(BaseScraper):
         """Parse a single page of the speech list."""
         speeches = []
 
-        # Each speech entry has an <h3> with a link
-        for h3 in soup.find_all('h3'):
+        # Each speech entry is typically inside an <article> or similar container
+        # The date is in a span with class 'media-date'
+        for container in soup.find_all(['div', 'article'], class_=['media', 'mtt-result']):
+            h3 = container.find(['h3', 'h5'])
+            if not h3:
+                continue
+
             link = h3.find('a', href=True)
             if not link:
                 continue
@@ -94,13 +99,20 @@ class BOCScraper(BaseScraper):
             else:
                 continue
 
-            # Extract date from URL: /YYYY/MM/slug/
+            # 1. Extract date from text (e.g., "March 4, 2026")
             date = ''
-            date_match = re.search(r'/(\d{4})/(\d{2})/', href)
-            if date_match:
-                date = f"{date_match.group(1)}-{date_match.group(2)}-01"
+            date_tag = container.find('span', class_=['media-date', 'pressdate'])
+            if date_tag:
+                date_text = date_tag.get_text(strip=True)
+                date = self._parse_boc_date(date_text)
 
-            # Extract speaker from nearby /profile/ link
+            # 2. Fallback to URL date if text date extraction failed
+            if not date:
+                date_match = re.search(r'/(\d{4})/(\d{2})/', href)
+                if date_match:
+                    date = f"{date_match.group(1)}-{date_match.group(2)}-01"
+
+            # 3. Extract speaker from nearby /profile/ link
             speaker = self._extract_speaker(h3)
 
             speeches.append({
@@ -112,6 +124,34 @@ class BOCScraper(BaseScraper):
 
         return speeches
 
+    def _parse_boc_date(self, date_text):
+        """Parse BOC date formats like 'March 4, 2026' or 'March 04, 2026'."""
+        if not date_text:
+            return None
+            
+        # Clean the text (remove extra spaces, non-breaking spaces)
+        date_text = date_text.replace('\xa0', ' ').strip()
+        
+        for fmt in ['%B %d, %Y', '%b %d, %Y', '%Y-%m-%d']:
+            try:
+                dt = datetime.strptime(date_text, fmt)
+                return dt.strftime('%Y-%m-%d')
+            except ValueError:
+                continue
+                
+        # Try a more flexible regex for dates like "March 4, 2026"
+        match = re.search(r'([A-Za-z]+)\s+(\d{1,2}),\s+(\d{4})', date_text)
+        if match:
+            month_str, day_str, year_str = match.groups()
+            try:
+                # Use strptime with %B for full month name
+                dt = datetime.strptime(f"{month_str} {day_str} {year_str}", "%B %d %Y")
+                return dt.strftime('%Y-%m-%d')
+            except ValueError:
+                pass
+
+        return None
+
     def _extract_speaker(self, h3_tag):
         """Extract speaker name from the /profile/ link near the h3 tag."""
         # Look in the parent container for a profile link
@@ -119,36 +159,21 @@ class BOCScraper(BaseScraper):
         if not parent:
             return None
 
-        # Search up to 2 levels of parents
-        for _ in range(2):
-            profile_link = parent.find('a', href=re.compile(r'/profile/'))
+        # Search up to 2 levels of parents/siblings
+        container = h3_tag.find_parent(['div', 'article'])
+        if container:
+            profile_link = container.find('a', href=re.compile(r'/profile/'))
             if profile_link:
+                # Remove extra info like 'Governor - Executive' if needed
                 return profile_link.get_text(strip=True)
-            parent = parent.parent
-            if not parent:
-                break
 
         return None
 
     def _has_next_page(self, soup):
         """Check if there's a next page in pagination."""
-        # BOC uses .page-numbers for pagination
         pagination = soup.find('a', class_='next') or soup.find('a', string=re.compile(r'Next|›|»'))
         if pagination:
             return True
-
-        # Also check for page-numbers links
-        page_links = soup.find_all('a', class_='page-numbers')
-        if page_links:
-            # If there are page number links, check if any is 'next'
-            for link in page_links:
-                if 'next' in link.get('class', []):
-                    return True
-                # If current page number exists and there's a higher one
-                text = link.get_text(strip=True)
-                if text.isdigit():
-                    return True  # There are more pages available
-
         return False
 
     def fetch_speech_text(self, url):

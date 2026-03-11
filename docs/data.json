@@ -1,8 +1,8 @@
 {
-  "last_updated": "2026-03-12T01:49:19.113615",
-  "total_speeches": 522,
+  "last_updated": "2026-03-12T01:59:21.830321",
+  "total_speeches": 524,
   "bank_stats": {
-    "BOC": 42,
+    "BOC": 44,
     "BOE": 115,
     "BOJ": 36,
     "ECB": 113,
@@ -10,6 +10,13 @@
     "RBA": 82
   },
   "recent_logs": [
+    {
+      "started_at": "2026-03-12T01:53:11.096151",
+      "finished_at": "2026-03-12T01:59:21.677819",
+      "status": "success",
+      "total_new": 44,
+      "error": null
+    },
     {
       "started_at": "2026-03-12T01:44:09.245737",
       "finished_at": "2026-03-12T01:49:18.984620",
@@ -81,11 +88,11 @@
     "BOC": [
       {
         "name": "Tiff Macklem",
-        "count": 28
+        "count": 27
       },
       {
         "name": "Sharon Kozicki",
-        "count": 4
+        "count": 3
       },
       {
         "name": "Carolyn Rogers",
