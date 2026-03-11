@@ -21,8 +21,8 @@ from src.scrapers.boj import BOJScraper
 from src.scrapers.rba import RBAScraper
 from src.scrapers.boc import BOCScraper
 
-def run_collection():
-    print("=== Central Bank Speech Archiving Started ===")
+def run_collection(start_year=2025):
+    print(f"=== Central Bank Speech Archiving Started (Since {start_year}) ===")
     db = SpeechDB()
     
     started_at = datetime.now().isoformat()
@@ -43,13 +43,14 @@ def run_collection():
     for scraper in scrapers:
         try:
             print(f"\n[*] Collecting {scraper.BANK_CODE} ({scraper.BANK_NAME})...")
-            new_count = scraper.collect_new_speeches(start_year=2025)
+            # 지정된 연도부터 현재까지의 데이터 수집
+            new_count = scraper.collect_new_speeches(start_year=start_year)
             bank_stats[scraper.BANK_CODE] = new_count
             total_new += new_count
             print(f"[+] {scraper.BANK_CODE}: {new_count} new speeches added.")
         except Exception as e:
             logger.error(f"Failed to collect {scraper.BANK_CODE}: {e}")
-            bank_stats[scraper.BANK_CODE] = -1 # 에러 표시
+            bank_stats[scraper.BANK_CODE] = -1
             overall_status = "partial"
             error_msg = f"{error_msg} | " if error_msg else ""
             error_msg += f"{scraper.BANK_CODE}: {str(e)}"
@@ -78,4 +79,9 @@ def run_collection():
     print("===========================")
 
 if __name__ == "__main__":
-    run_collection()
+    # 실행 시 연도를 인자로 넘길 수 있음: python3 main.py 2019
+    year = 2025
+    if len(sys.argv) > 1 and sys.argv[1].isdigit():
+        year = int(sys.argv[1])
+    
+    run_collection(start_year=year)
