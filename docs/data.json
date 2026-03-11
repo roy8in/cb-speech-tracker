@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-12T07:09:57.862200",
+  "last_updated": "2026-03-12T07:51:24.480750",
   "total_speeches": 2097,
   "bank_stats": {
     "FRB": 577,
@@ -40,6 +40,27 @@
     }
   ],
   "recent_speeches": [
+    {
+      "bank": "BOE",
+      "speaker": "Phil Evans",
+      "title": "Phil Evans: Speech at the University of Leeds ‘Modernising the liquidity framework for banks and building societies’ (to be published at 11.30am)",
+      "date": "2026-03-17",
+      "url": "https://www.bankofengland.co.uk/speech/2026/march/phil-evans-speech-at-the-university-of-leeds"
+    },
+    {
+      "bank": "BOE",
+      "speaker": "Vicky White",
+      "title": "Vicky White: Speech at Connect Global Group 4th annual treasury and capital markets forum (to be published at 2.40pm)",
+      "date": "2026-03-12",
+      "url": "https://www.bankofengland.co.uk/speech/2026/march/vicky-white-speech-at-connect-global-group-4th-annual-treasury-and-capital-markets-forum"
+    },
+    {
+      "bank": "BOE",
+      "speaker": "Andrew Bailey",
+      "title": "Andrew Bailey: Opening remarks at the Financial Stability Board payments summit, as part of his FSB Chair (to be published at 9.30am)",
+      "date": "2026-03-12",
+      "url": "https://www.bankofengland.co.uk/speech/2026/march/andrew-bailey-opening-remarks-at-financial-stability-board-payments-summit"
+    },
     {
       "bank": "RBA",
       "speaker": "Deputy Governor",
@@ -126,31 +147,10 @@
     },
     {
       "bank": "BOE",
-      "speaker": "Vicky White",
-      "title": "Vicky White: Speech at Connect Global Group 4th annual treasury and capital markets forum (to be published at 2.40pm)",
-      "date": "2026-03-01",
-      "url": "https://www.bankofengland.co.uk/speech/2026/march/vicky-white-speech-at-connect-global-group-4th-annual-treasury-and-capital-markets-forum"
-    },
-    {
-      "bank": "BOE",
       "speaker": "Alan Taylor",
       "title": "Getting the right directions − speech by Alan Taylor",
-      "date": "2026-03-01",
+      "date": "2026-03-02",
       "url": "https://www.bankofengland.co.uk/speech/2026/march/speech-by-alan-taylor-getting-the-right-directions"
-    },
-    {
-      "bank": "BOE",
-      "speaker": "Phil Evans",
-      "title": "Phil Evans: Speech at the University of Leeds ‘Modernising the liquidity framework for banks and building societies’ (to be published at 11.30am)",
-      "date": "2026-03-01",
-      "url": "https://www.bankofengland.co.uk/speech/2026/march/phil-evans-speech-at-the-university-of-leeds"
-    },
-    {
-      "bank": "BOE",
-      "speaker": "Andrew Bailey",
-      "title": "Andrew Bailey: Opening remarks at the Financial Stability Board payments summit, as part of his FSB Chair (to be published at 9.30am)",
-      "date": "2026-03-01",
-      "url": "https://www.bankofengland.co.uk/speech/2026/march/andrew-bailey-opening-remarks-at-financial-stability-board-payments-summit"
     },
     {
       "bank": "BOC",

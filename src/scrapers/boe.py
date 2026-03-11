@@ -7,6 +7,7 @@ Sitemap: https://www.bankofengland.co.uk/sitemap/speeches
 
 import re
 import logging
+from datetime import datetime
 from .base import BaseScraper
 
 logger = logging.getLogger(__name__)
@@ -48,12 +49,12 @@ class BOEScraper(BaseScraper):
             else:
                 speech_url = f"{self.BASE_URL}/{href}"
 
+            # Initial date from URL (defaults to 1st of the month)
             date = self._extract_date_from_url(href, year)
 
             if year and date and not date.startswith(str(year)):
                 continue
 
-            # Advanced Speaker Extraction
             speaker = self.extract_speaker_from_title(title)
 
             speeches.append({
@@ -74,34 +75,18 @@ class BOEScraper(BaseScraper):
 
     @staticmethod
     def extract_speaker_from_title(title):
-        """
-        Extract speaker name from BOE title using common patterns.
-        """
-        # Clean title from (pdf ...) info
         clean_title = re.sub(r'\(pdf\s*.*\)', '', title, flags=re.IGNORECASE).strip()
-        
-        # Pattern 1: Title [dash] speech/remarks/slides by Name
         m = re.search(r'.+[−–-]\s*(?:speech|remarks|slides|panel remarks|address)\s+by\s+([^−–-]+)$', clean_title, re.IGNORECASE)
-        if m:
-            return m.group(1).strip()
-            
-        # Pattern 2: Name: Title
+        if m: return m.group(1).strip()
         if ':' in clean_title:
             potential = clean_title.split(':')[0].strip()
-            # Names are usually 2-4 words
             if 1 < len(potential.split()) < 5 and not any(w in potential.lower() for w in ['at', 'the', 'meeting', 'update']):
                 return potential
-                
-        # Pattern 3: Slides from Name's ...
         m = re.search(r'Slides\s+from\s+([^’\']+)[’\']s', clean_title, re.IGNORECASE)
-        if m:
-            return m.group(1).strip()
-            
+        if m: return m.group(1).strip()
         return None
 
     def _extract_date_from_url(self, href, default_year):
-        """Extract date from BOE URL patterns."""
-        from datetime import datetime
         match = re.search(r'/(\d{4})/(\w+)', href)
         if match:
             year = match.group(1)
@@ -120,23 +105,43 @@ class BOEScraper(BaseScraper):
         return ''
 
     def fetch_speech_text(self, url):
-        """Fetch the full text of a BOE speech."""
+        """Fetch the full text and exact date of a BOE speech."""
         resp = self._get(url)
         if not resp:
             return None
         soup = self._parse_html(resp.text)
-        content = (
+        
+        # Extract precise date
+        # Pattern: Published on 12 March 2026
+        exact_date = None
+        date_el = soup.find('div', class_='published-date')
+        if date_el:
+            date_text = date_el.get_text(strip=True).replace('Published on', '').strip()
+            try:
+                dt = datetime.strptime(date_text, '%d %B %Y')
+                exact_date = dt.strftime('%Y-%m-%d')
+            except ValueError:
+                pass
+        
+        # If exact date found, we could potentially update the DB here, 
+        # but normally we return text. Let's attach date to text for the collector.
+        content_el = (
             soup.find('div', class_='page-content') or
             soup.find('article') or
             soup.find('div', class_='content-block') or
             soup.find('main')
         )
-        if content:
-            for tag in content.find_all(['nav', 'header', 'footer', 'script', 'style',
-                                          'aside', 'button']):
+        
+        text = ""
+        if content_el:
+            for tag in content_el.find_all(['nav', 'header', 'footer', 'script', 'style', 'aside', 'button']):
                 tag.decompose()
-            return content.get_text(separator='\n', strip=True)
-        return None
+            text = content_el.get_text(separator='\n', strip=True)
+            
+        # Meta info hack to pass back to collector if needed
+        if exact_date:
+            return f"__DATE__:{exact_date}\n{text}"
+        return text
 
     def get_all_speeches(self, start_year=None, end_year=None):
         all_speeches = self.fetch_speech_list()
