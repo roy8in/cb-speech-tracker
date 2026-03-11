@@ -114,6 +114,15 @@ class BOCScraper(BaseScraper):
 
             # 3. Extract speaker from nearby /profile/ link
             speaker = self._extract_speaker(h3)
+            
+            # 4. Fallback: Extract from title if speaker is still None
+            if not speaker:
+                for sep in [':', '—', ' - ']:
+                    if sep in title:
+                        potential = title.split(sep)[0].strip()
+                        if 1 < len(potential.split()) < 5:
+                            speaker = potential
+                            break
 
             speeches.append({
                 'title': title,

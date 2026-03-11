@@ -202,18 +202,20 @@
                         <td style="font-size: 0.7rem; color: var(--text-dim);">${log.error || 'Normal'}</td>
                     </tr>
                 `).join('');
-
-                const speechBody = document.getElementById('speech-body');
-                if (data.recent_speeches && data.recent_speeches.length > 0) {
-                    speechBody.innerHTML = data.recent_speeches.map(s => `
-                        <tr>
-                            <td><span class="bank-badge">${BANK_FLAGS[s.bank] || ''} ${s.bank}</span></td>
-                            <td style="font-weight: 600;">${s.speaker || '-'}</td>
-                            <td><a href="${s.url}" target="_blank" class="speech-link">${s.title}</a></td>
-                            <td class="col-date">${s.date}</td>
-                        </tr>
-                    `).join('');
-                } else {
+// 4. Recent Speeches
+const speechBody = document.getElementById('speech-body');
+if (data.recent_speeches && data.recent_speeches.length > 0) {
+    speechBody.innerHTML = data.recent_speeches.map(s => `
+        <tr>
+            <td><span class="bank-badge">${BANK_FLAGS[s.bank] || ''} ${s.bank}</span></td>
+            <td style="font-weight: 600; color: ${s.speaker ? 'var(--text-main)' : 'var(--text-dim)'};">
+                ${s.speaker || 'Central Bank'}
+            </td>
+            <td><a href="${s.url}" target="_blank" class="speech-link">${s.title}</a></td>
+            <td class="col-date">${s.date}</td>
+        </tr>
+    `).join('');
+} else {
                     speechBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-dim); padding: 2rem;">No recent speeches found.</td></tr>';
                 }
 
