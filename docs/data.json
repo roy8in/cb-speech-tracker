@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-12T08:05:27.333230",
+  "last_updated": "2026-03-12T08:09:26.790696",
   "total_speeches": 2097,
   "bank_stats": {
     "FRB": 577,
@@ -70,7 +70,7 @@
     },
     {
       "bank": "BOC",
-      "speaker": null,
+      "speaker": "Export Development",
       "title": "Bank of Canada, Export Development Canada, RBC and TD successfully complete bond issuance experiment  using distributed ledger technology",
       "date": "2026-03-05",
       "url": "https://www.bankofcanada.ca/2026/03/bank-canada-export-development-canada-rbc-td-successfully-complete-bond-issuance-experiment-distributed-ledger-technology/"
@@ -91,14 +91,14 @@
     },
     {
       "bank": "RBA",
-      "speaker": "",
+      "speaker": null,
       "title": "Q&A Transcript",
       "date": "2026-03-03",
       "url": "https://www.rba.gov.au/speeches/2026/sp-gov-2026-03-03-q-and-a-transcript.html"
     },
     {
       "bank": "RBA",
-      "speaker": "",
+      "speaker": null,
       "title": "Listening to Australians, Interpreting the Data and Setting Monetary Policy",
       "date": "2026-03-03",
       "url": "https://www.rba.gov.au/speeches/2026/sp-gov-2026-03-03.html"
