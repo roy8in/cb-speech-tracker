@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-12T08:09:26.790696",
+  "last_updated": "2026-03-12T08:11:52.230992",
   "total_speeches": 2097,
   "bank_stats": {
     "FRB": 577,
@@ -63,7 +63,7 @@
     },
     {
       "bank": "RBA",
-      "speaker": "Deputy",
+      "speaker": "Andrew Hauser",
       "title": "On the Safe-haven Status of the US Dollar",
       "date": "2026-03-07",
       "url": "https://www.rba.gov.au/speeches/2026/sp-dg-2026-03-07.html"
@@ -91,14 +91,14 @@
     },
     {
       "bank": "RBA",
-      "speaker": null,
+      "speaker": "Michele Bullock",
       "title": "Q&A Transcript",
       "date": "2026-03-03",
       "url": "https://www.rba.gov.au/speeches/2026/sp-gov-2026-03-03-q-and-a-transcript.html"
     },
     {
       "bank": "RBA",
-      "speaker": null,
+      "speaker": "Michele Bullock",
       "title": "Listening to Australians, Interpreting the Data and Setting Monetary Policy",
       "date": "2026-03-03",
       "url": "https://www.rba.gov.au/speeches/2026/sp-gov-2026-03-03.html"
@@ -133,7 +133,7 @@
     },
     {
       "bank": "RBA",
-      "speaker": "Assistant",
+      "speaker": "Sarah Hunter",
       "title": "Recent Refinements to the Dual Mandate and Navigating Back to Target",
       "date": "2026-03-02",
       "url": "https://www.rba.gov.au/speeches/2026/sp-ag-2026-03-02.html"
