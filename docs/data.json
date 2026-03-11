@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-12T02:02:07.673058",
+  "last_updated": "2026-03-12T02:05:24.837196",
   "total_speeches": 524,
   "bank_stats": {
     "FRB": 134,
@@ -46,6 +46,125 @@
       "title": "Bank of Canada, Export Development Canada, RBC and TD successfully complete bond issuance experiment  using distributed ledger technology",
       "date": "2026-03-05",
       "url": "https://www.bankofcanada.ca/2026/03/bank-canada-export-development-canada-rbc-td-successfully-complete-bond-issuance-experiment-distributed-ledger-technology/"
+    },
+    {
+      "bank": "BOC",
+      "speaker": "Tiff Macklem",
+      "title": "Identifying pressure points in a changing financial system",
+      "date": "2026-03-04",
+      "url": "https://www.bankofcanada.ca/2026/03/identifying-pressure-points-in-a-changing-financial-system/"
+    },
+    {
+      "bank": "BOC",
+      "speaker": null,
+      "title": "New players, old risks: Financial stability in a changing landscape",
+      "date": "2026-03-04",
+      "url": "https://www.bankofcanada.ca/2026/03/new-players-old-risks-financial-stability-in-a-changing-landscape/"
+    },
+    {
+      "bank": "RBA",
+      "speaker": "Governor",
+      "title": "Q&A Transcript",
+      "date": "2026-03-03",
+      "url": "https://www.rba.gov.au/speeches/2026/sp-gov-2026-03-03-q-and-a-transcript.html"
+    },
+    {
+      "bank": "RBA",
+      "speaker": "Governor",
+      "title": "Listening to Australians, Interpreting the Data and Setting Monetary Policy",
+      "date": "2026-03-03",
+      "url": "https://www.rba.gov.au/speeches/2026/sp-gov-2026-03-03.html"
+    },
+    {
+      "bank": "BOJ",
+      "speaker": null,
+      "title": "\"The New Financial Ecosystem and the Role of Central Banks\" (Remarks at the FIN/SUM 2026)",
+      "date": "2026-03-03",
+      "url": "https://www.boj.or.jp/en/about/press/koen_2026/ko260303a.htm"
+    },
+    {
+      "bank": "FRB",
+      "speaker": "Bowman",
+      "title": "Liquidity Resiliency, Financial Stability, and the Role of the Federal Reserve",
+      "date": "2026-03-03",
+      "url": "https://www.federalreserve.gov/newsevents/speech/bowman20260303a.htm"
+    },
+    {
+      "bank": "BOC",
+      "speaker": "Sharon Kozicki",
+      "title": "Monetary policy in a turbulent world",
+      "date": "2026-03-02",
+      "url": "https://www.bankofcanada.ca/2026/03/monetary-policy-in-a-turbulent-world/"
+    },
+    {
+      "bank": "BOC",
+      "speaker": null,
+      "title": "Canada’s monetary policy framework in a world of supply-driven trade-offs",
+      "date": "2026-03-02",
+      "url": "https://www.bankofcanada.ca/2026/03/canadas-monetary-policy-framework-world-supply-driven-trade-offs/"
+    },
+    {
+      "bank": "RBA",
+      "speaker": "Assistant Governor",
+      "title": "Recent Refinements to the Dual Mandate and Navigating Back to Target",
+      "date": "2026-03-02",
+      "url": "https://www.rba.gov.au/speeches/2026/sp-ag-2026-03-02.html"
+    },
+    {
+      "bank": "BOJ",
+      "speaker": null,
+      "title": "\"Japan's Economy and Monetary Policy\" (Speech at a Meeting with Local Leaders in Wakayama)",
+      "date": "2026-03-02",
+      "url": "https://www.boj.or.jp/en/about/press/koen_2026/ko260302a.htm"
+    },
+    {
+      "bank": "BOE",
+      "speaker": null,
+      "title": "Vicky White: Speech at Connect Global Group 4th annual treasury and capital markets forum (to be published at 2.40pm)",
+      "date": "2026-03-01",
+      "url": "https://www.bankofengland.co.uk/speech/2026/march/vicky-white-speech-at-connect-global-group-4th-annual-treasury-and-capital-markets-forum"
+    },
+    {
+      "bank": "BOE",
+      "speaker": null,
+      "title": "Getting the right directions − speech by Alan Taylor",
+      "date": "2026-03-01",
+      "url": "https://www.bankofengland.co.uk/speech/2026/march/speech-by-alan-taylor-getting-the-right-directions"
+    },
+    {
+      "bank": "BOE",
+      "speaker": null,
+      "title": "Phil Evans: Speech at the University of Leeds ‘Modernising the liquidity framework for banks and building societies’ (to be published at 11.30am)",
+      "date": "2026-03-01",
+      "url": "https://www.bankofengland.co.uk/speech/2026/march/phil-evans-speech-at-the-university-of-leeds"
+    },
+    {
+      "bank": "BOE",
+      "speaker": null,
+      "title": "Andrew Bailey: Opening remarks at the Financial Stability Board payments summit, as part of his FSB Chair (to be published at 9.30am)",
+      "date": "2026-03-01",
+      "url": "https://www.bankofengland.co.uk/speech/2026/march/andrew-bailey-opening-remarks-at-financial-stability-board-payments-summit"
+    },
+    {
+      "bank": "BOC",
+      "speaker": null,
+      "title": "Bank of Canada issues revised compliance order to XTM Inc.",
+      "date": "2026-02-27",
+      "url": "https://www.bankofcanada.ca/2026/02/bank-of-canada-issues-revised-compliance-order-to-xtm-inc/"
+    },
+    {
+      "bank": "BOJ",
+      "speaker": null,
+      "title": "\"Economic Activity, Prices, and Monetary Policy in Japan\" (Speech at a Meeting with Local Leaders in Kyoto)",
+      "date": "2026-02-26",
+      "url": "https://www.boj.or.jp/en/about/press/koen_2026/ko260226a.htm"
+    },
+    {
+      "bank": "FRB",
+      "speaker": "Bowman",
+      "title": "Supervision and Regulation",
+      "date": "2026-02-26",
+      "url": "https://www.federalreserve.gov/newsevents/speech/bowman20260226a.htm"
     }
   ],
   "health": "success"

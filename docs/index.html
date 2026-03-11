@@ -15,7 +15,6 @@
             --accent-green: #10b981;
             --accent-red: #ef4444;
             --accent-blue: #3b82f6;
-            --accent-orange: #f59e0b;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -38,41 +37,41 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-main); }
+        .logo { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
         .logo span { color: var(--accent-blue); }
 
         .status-badge {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 99px;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             font-weight: 600;
             background: rgba(255,255,255,0.05);
         }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; }
         .status-success { color: var(--accent-green); }
-        .status-success .status-dot { background-color: var(--accent-green); box-shadow: 0 0 10px var(--accent-green); }
+        .status-success .status-dot { background-color: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
         .status-failed { color: var(--accent-red); }
         .status-failed .status-dot { background-color: var(--accent-red); }
 
         .grid-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(7, 1fr); /* 7개 카드를 무조건 한 줄에 */
+            gap: 0.75rem;
             margin-bottom: 2rem;
         }
 
         .stat-card {
             background: var(--card-bg);
-            padding: 1.25rem;
-            border-radius: 12px;
+            padding: 1rem 0.5rem;
+            border-radius: 10px;
             border: 1px solid var(--border-color);
             text-align: center;
         }
-        .stat-label { color: var(--text-dim); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem; }
-        .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
+        .stat-label { color: var(--text-dim); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.25rem; }
+        .stat-value { font-size: 1.25rem; font-weight: 800; color: var(--text-main); }
 
         section {
             background: var(--card-bg);
@@ -82,26 +81,32 @@
             margin-bottom: 2rem;
         }
 
-        h2 { font-size: 1.1rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+        h2 { font-size: 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
 
-        .data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-        .data-table th { text-align: left; padding: 0.75rem; color: var(--text-dim); border-bottom: 1px solid var(--border-color); }
-        .data-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-color); }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .data-table th { text-align: left; padding: 0.75rem; color: var(--text-dim); border-bottom: 1px solid var(--border-color); font-weight: 600; }
+        .data-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-color); vertical-align: top; }
         
         .bank-badge {
-            font-size: 0.7rem;
-            padding: 2px 6px;
+            font-size: 0.65rem;
+            padding: 2px 5px;
             border-radius: 4px;
             background: var(--accent-blue);
             color: white;
             font-weight: bold;
-            display: inline-block;
         }
 
-        .speech-link { color: var(--text-main); text-decoration: none; font-weight: 500; }
+        .speech-link { color: var(--text-main); text-decoration: none; font-weight: 500; display: block; line-height: 1.4; }
         .speech-link:hover { color: var(--accent-blue); text-decoration: underline; }
 
-        footer { text-align: center; color: var(--text-dim); font-size: 0.75rem; margin-top: 2rem; }
+        footer { text-align: center; color: var(--text-dim); font-size: 0.7rem; margin-top: 2rem; }
+
+        @media (max-width: 1000px) {
+            .grid-stats { grid-template-columns: repeat(4, 1fr); } /* 태블릿에서는 두 줄 */
+        }
+        @media (max-width: 600px) {
+            .grid-stats { grid-template-columns: repeat(2, 1fr); } /* 모바일에서는 여러 줄 */
+        }
     </style>
 </head>
 <body>
@@ -115,7 +120,7 @@
         </header>
 
         <div class="grid-stats" id="bank-stats-grid">
-            <!-- Stats Grid -->
+            <!-- Stats Grid Loaded by JS -->
         </div>
 
         <section>
@@ -134,14 +139,14 @@
         </section>
 
         <section>
-            <h2>🎙️ Recent Speeches (Last 7 Days)</h2>
+            <h2>🎙️ Recent Speeches (Last 7-14 Days)</h2>
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th style="width: 80px;">Bank</th>
-                        <th style="width: 150px;">Speaker</th>
+                        <th style="width: 70px;">Bank</th>
+                        <th style="width: 140px;">Speaker</th>
                         <th>Title</th>
-                        <th style="width: 120px;">Date</th>
+                        <th style="width: 100px;">Date</th>
                     </tr>
                 </thead>
                 <tbody id="speech-body"></tbody>
@@ -156,20 +161,19 @@
     <script>
         async function loadData() {
             try {
-                const response = await fetch('data.json');
+                const response = await fetch('data.json?t=' + Date.now());
                 const data = await response.json();
 
                 // 1. Status
                 const healthEl = document.getElementById('health-status');
-                document.getElementById('status-text').innerText = data.health === 'success' ? 'All Systems Operational' : 'Issues Detected';
+                document.getElementById('status-text').innerText = data.health === 'success' ? 'Operational' : 'Issues';
                 healthEl.className = 'status-badge ' + (data.health === 'success' ? 'status-success' : 'status-failed');
                 document.getElementById('last-updated').innerText = new Date(data.last_updated).toLocaleString();
 
-                // 2. Stats Grid (Including BOC)
+                // 2. Stats Grid
                 const statsGrid = document.getElementById('bank-stats-grid');
                 let statsHtml = `<div class="stat-card"><div class="stat-label">Total</div><div class="stat-value">${data.total_speeches.toLocaleString()}</div></div>`;
                 
-                // 정해진 순서대로 출력 (FRB, ECB, BOE, BOJ, RBA, BOC)
                 const bankOrder = ['FRB', 'ECB', 'BOE', 'BOJ', 'RBA', 'BOC'];
                 bankOrder.forEach(bank => {
                     const count = data.bank_stats[bank] || 0;
@@ -188,7 +192,7 @@
                     </tr>
                 `).join('');
 
-                // 4. Recent Speeches (Last 7 Days)
+                // 4. Recent Speeches
                 const speechBody = document.getElementById('speech-body');
                 if (data.recent_speeches && data.recent_speeches.length > 0) {
                     speechBody.innerHTML = data.recent_speeches.map(s => `
@@ -200,7 +204,7 @@
                         </tr>
                     `).join('');
                 } else {
-                    speechBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-dim);">No speeches found in the last 7 days.</td></tr>';
+                    speechBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-dim); padding: 2rem;">No recent speeches found.</td></tr>';
                 }
 
             } catch (error) {

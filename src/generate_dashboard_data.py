@@ -22,7 +22,7 @@ def generate_data():
     conn.row_factory = sqlite3.Row
     
     try:
-        # 1. 은행별 통계 (모든 은행 강제 포함)
+        # 1. 은행별 통계
         banks = ['FRB', 'ECB', 'BOE', 'BOJ', 'RBA', 'BOC']
         bank_stats = {bank: 0 for bank in banks}
         rows = conn.execute("SELECT bank_code, COUNT(*) as count FROM speeches GROUP BY bank_code").fetchall()
@@ -41,15 +41,17 @@ def generate_data():
                 'error': r['error_message']
             })
             
-        # 3. 최근 7일간의 연설 (New!)
-        seven_days_ago = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+        # 3. 최근 연설 (넉넉하게 최근 14일치 탐색)
+        # 오늘이 3월 12일이면 3월 5일 이후 데이터를 가져옵니다.
+        threshold_date = (datetime.now() - timedelta(days=14)).strftime('%Y-%m-%d')
         recent_speeches = []
         rows = conn.execute("""
             SELECT bank_code, speaker, title, date, url 
             FROM speeches 
             WHERE date >= ? 
             ORDER BY date DESC, fetched_at DESC
-        """, (seven_days_ago,)).fetchall()
+            LIMIT 50
+        """, (threshold_date,)).fetchall()
         
         for r in rows:
             recent_speeches.append({
@@ -78,7 +80,7 @@ def generate_data():
         with open(OUTPUT_PATH, 'w', encoding='utf-8') as f:
             json.dump(dashboard_data, f, indent=2, ensure_ascii=False)
             
-        print(f"Successfully generated dashboard data at {OUTPUT_PATH}")
+        print(f"Successfully generated dashboard data at {OUTPUT_PATH}. Found {len(recent_speeches)} recent speeches.")
         
     finally:
         conn.close()
