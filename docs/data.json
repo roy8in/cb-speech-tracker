@@ -1,0 +1,119 @@
+{
+  "last_updated": "2026-03-12T01:31:51.431994",
+  "total_speeches": 480,
+  "bank_stats": {
+    "BOE": 115,
+    "BOJ": 36,
+    "ECB": 113,
+    "FRB": 134,
+    "RBA": 82
+  },
+  "recent_logs": [
+    {
+      "started_at": "2026-03-12T01:30:27.778066",
+      "finished_at": "2026-03-12T01:31:51.232039",
+      "status": "success",
+      "total_new": 0,
+      "error": null
+    }
+  ],
+  "speakers": {
+    "ECB": [
+      {
+        "name": "Christine Lagarde",
+        "count": 33
+      },
+      {
+        "name": "Piero Cipollone",
+        "count": 22
+      },
+      {
+        "name": "Philip R. Lane",
+        "count": 21
+      },
+      {
+        "name": "Isabel Schnabel",
+        "count": 14
+      },
+      {
+        "name": "Frank Elderson",
+        "count": 10
+      },
+      {
+        "name": "Luis de Guindos",
+        "count": 9
+      },
+      {
+        "name": "",
+        "count": 3
+      },
+      {
+        "name": "Christine Lagarde,Philip R. Lane",
+        "count": 1
+      }
+    ],
+    "RBA": [
+      {
+        "name": "Assistant Governor",
+        "count": 32
+      },
+      {
+        "name": "Governor",
+        "count": 26
+      },
+      {
+        "name": "Deputy Governor",
+        "count": 15
+      },
+      {
+        "name": "Senior Officer",
+        "count": 9
+      }
+    ],
+    "FRB": [
+      {
+        "name": "Bowman",
+        "count": 26
+      },
+      {
+        "name": "Barr",
+        "count": 25
+      },
+      {
+        "name": "Waller",
+        "count": 23
+      },
+      {
+        "name": "Jefferson",
+        "count": 15
+      },
+      {
+        "name": "Kugler",
+        "count": 14
+      },
+      {
+        "name": "Cook",
+        "count": 13
+      },
+      {
+        "name": "Powell",
+        "count": 13
+      },
+      {
+        "name": "Miran",
+        "count": 5
+      }
+    ],
+    "BOJ": [
+      {
+        "name": "Opening Remarks",
+        "count": 1
+      },
+      {
+        "name": "Wage Increases",
+        "count": 1
+      }
+    ]
+  },
+  "health": "success"
+}

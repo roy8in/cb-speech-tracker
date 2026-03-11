@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CB Speech Tracker | Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        :root {
+            --bg-color: #0f1117;
+            --card-bg: #1a1d27;
+            --border-color: #2d333f;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --accent-orange: #f59e0b;
+        }
+
+        * { margin: 0; padding: 0; box-box: border-box; }
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main);
+            font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            line-height: 1.5;
+            padding: 2rem;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-main); }
+        .logo span { color: var(--accent-blue); }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.05);
+        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-success { color: var(--accent-green); }
+        .status-success .status-dot { background-color: var(--accent-green); box-shadow: 0 0 10px var(--accent-green); }
+        .status-failed { color: var(--accent-red); }
+        .status-failed .status-dot { background-color: var(--accent-red); }
+
+        .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-2px); border-color: var(--accent-blue); }
+        .stat-label { color: var(--text-dim); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem; }
+        .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--text-main); }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 { font-size: 1.1rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+
+        .log-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .log-table th { text-align: left; padding: 0.75rem; color: var(--text-dim); border-bottom: 1px solid var(--border-color); }
+        .log-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-color); }
+        
+        .speaker-list {
+            max-height: 500px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .speaker-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.02);
+            font-size: 0.875rem;
+        }
+        .speaker-count { color: var(--accent-blue); font-weight: 700; }
+
+        .bank-badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--accent-blue);
+            color: white;
+            font-weight: bold;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+        @media (max-width: 768px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">CB <span>SPEECH</span> TRACKER</div>
+            <div id="health-status" class="status-badge">
+                <div class="status-dot"></div>
+                <span id="status-text">Loading...</span>
+            </div>
+        </header>
+
+        <div class="grid-stats" id="bank-stats-grid">
+            <!-- Stats will be loaded here -->
+        </div>
+
+        <div class="main-content">
+            <div class="left-col">
+                <section>
+                    <h2>📋 Recent Collection Logs</h2>
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>New Items</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="log-body">
+                            <!-- Logs will be loaded here -->
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+
+            <div class="right-col">
+                <section>
+                    <h2>👤 Top Speakers</h2>
+                    <div id="speaker-list" class="speaker-list">
+                        <!-- Speakers will be loaded here -->
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <footer style="text-align: center; color: var(--text-dim); font-size: 0.75rem; margin-top: 2rem;">
+            Last Sync: <span id="last-updated">-</span>
+        </footer>
+    </div>
+
+    <script>
+        async function loadData() {
+            try {
+                const response = await fetch('data.json');
+                const data = await response.json();
+
+                // 1. Update Status & Last Updated
+                const healthEl = document.getElementById('health-status');
+                const statusText = document.getElementById('status-text');
+                const lastUpdated = document.getElementById('last-updated');
+                
+                if (data.health === 'success') {
+                    healthEl.className = 'status-badge status-success';
+                    statusText.innerText = 'All Systems Operational';
+                } else {
+                    healthEl.className = 'status-badge status-failed';
+                    statusText.innerText = 'Issues Detected';
+                }
+                lastUpdated.innerText = new Date(data.last_updated).toLocaleString();
+
+                // 2. Update Bank Stats Grid
+                const statsGrid = document.getElementById('bank-stats-grid');
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-label">Total Archive</div>
+                        <div class="stat-value">${data.total_speeches.toLocaleString()}</div>
+                    </div>
+                ` + Object.entries(data.bank_stats).map(([bank, count]) => `
+                    <div class="stat-card">
+                        <div class="stat-label">${bank}</div>
+                        <div class="stat-value">${count.toLocaleString()}</div>
+                    </div>
+                `).join('');
+
+                // 3. Update Logs
+                const logBody = document.getElementById('log-body');
+                logBody.innerHTML = data.recent_logs.map(log => `
+                    <tr>
+                        <td>${new Date(log.started_at).toLocaleDateString()}</td>
+                        <td style="color: ${log.status === 'success' ? 'var(--accent-green)' : 'var(--accent-red)'}">${log.status.toUpperCase()}</td>
+                        <td>+${log.total_new}</td>
+                        <td style="font-size: 0.7rem; color: var(--text-dim);">${log.error || 'Normal'}</td>
+                    </tr>
+                `).join('');
+
+                // 4. Update Speakers
+                const speakerList = document.getElementById('speaker-list');
+                let allSpeakers = [];
+                Object.entries(data.speakers).forEach(([bank, list]) => {
+                    list.forEach(s => allSpeakers.push({...s, bank}));
+                });
+                allSpeakers.sort((a, b) => b.count - a.count);
+
+                speakerList.innerHTML = allSpeakers.slice(0, 30).map(s => `
+                    <div class="speaker-item">
+                        <span><span class="bank-badge">${s.bank}</span> ${s.name || 'Unknown'}</span>
+                        <span class="speaker-count">${s.count}</span>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                document.getElementById('status-text').innerText = 'Data Load Error';
+            }
+        }
+
+        loadData();
+        // Refresh every 5 minutes
+        setInterval(loadData, 300000);
+    </script>
+</body>
+</html>

@@ -64,6 +64,17 @@ class SpeechDB:
                 CREATE INDEX IF NOT EXISTS idx_speeches_bank ON speeches(bank_code);
                 CREATE INDEX IF NOT EXISTS idx_speeches_date ON speeches(date);
                 CREATE INDEX IF NOT EXISTS idx_speeches_speaker ON speeches(speaker);
+
+                -- 3. 수집 로그 테이블
+                CREATE TABLE IF NOT EXISTS collection_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    started_at TEXT NOT NULL,
+                    finished_at TEXT,
+                    status TEXT, -- 'success', 'partial', 'failed'
+                    bank_stats_json TEXT, -- 각 은행별 수집 건수 (JSON)
+                    error_message TEXT,
+                    total_new_speeches INTEGER DEFAULT 0
+                );
             """)
             
             # 2. FTS5 전문 검색 테이블 (SQLite FTS5 모듈 필요)
