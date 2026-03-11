@@ -1,15 +1,22 @@
 {
-  "last_updated": "2026-03-12T02:05:24.837196",
-  "total_speeches": 524,
+  "last_updated": "2026-03-12T03:21:21.985782",
+  "total_speeches": 2097,
   "bank_stats": {
-    "FRB": 134,
-    "ECB": 113,
-    "BOE": 115,
-    "BOJ": 36,
-    "RBA": 82,
-    "BOC": 44
+    "FRB": 577,
+    "ECB": 225,
+    "BOE": 654,
+    "BOJ": 213,
+    "RBA": 142,
+    "BOC": 286
   },
   "recent_logs": [
+    {
+      "started_at": "2026-03-12T02:53:00.881263",
+      "finished_at": "2026-03-12T03:21:21.869505",
+      "status": "partial",
+      "total_new": 479,
+      "error": "BOE: invalid literal for int() with base 10: '5c_;cUV��)\\x1b��&�cbt�f�c9g5�*:�f�\\x10/�/\\x18�!Tv�#\\x19S��b��ތp�\\x1e\\x18�s,��k~�ޭn�Gܟ��������\\x15eB�Ti�,��\\x0ek�x����\\x0cUg�V��(N��iQ\\x1d�K\\x04m���<|����1������hE�\\x0c��Όʲq��r�}n�\\x0f�!��L\\x1f�\\x04L�"
+    },
     {
       "started_at": "2026-03-12T01:53:11.096151",
       "finished_at": "2026-03-12T01:59:21.677819",
@@ -167,5 +174,5 @@
       "url": "https://www.federalreserve.gov/newsevents/speech/bowman20260226a.htm"
     }
   ],
-  "health": "success"
+  "health": "partial"
 }
