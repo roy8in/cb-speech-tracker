@@ -1,7 +1,8 @@
 {
-  "last_updated": "2026-03-12T01:31:51.431994",
-  "total_speeches": 480,
+  "last_updated": "2026-03-12T01:49:19.113615",
+  "total_speeches": 522,
   "bank_stats": {
+    "BOC": 42,
     "BOE": 115,
     "BOJ": 36,
     "ECB": 113,
@@ -9,6 +10,13 @@
     "RBA": 82
   },
   "recent_logs": [
+    {
+      "started_at": "2026-03-12T01:44:09.245737",
+      "finished_at": "2026-03-12T01:49:18.984620",
+      "status": "success",
+      "total_new": 42,
+      "error": null
+    },
     {
       "started_at": "2026-03-12T01:30:27.778066",
       "finished_at": "2026-03-12T01:31:51.232039",
@@ -68,6 +76,36 @@
       {
         "name": "Senior Officer",
         "count": 9
+      }
+    ],
+    "BOC": [
+      {
+        "name": "Tiff Macklem",
+        "count": 28
+      },
+      {
+        "name": "Sharon Kozicki",
+        "count": 4
+      },
+      {
+        "name": "Carolyn Rogers",
+        "count": 2
+      },
+      {
+        "name": "Nicolas Vincent",
+        "count": 2
+      },
+      {
+        "name": "Rhys R. Mendes",
+        "count": 2
+      },
+      {
+        "name": "Ron Morrow",
+        "count": 2
+      },
+      {
+        "name": "Toni Gravelle",
+        "count": 2
       }
     ],
     "FRB": [
