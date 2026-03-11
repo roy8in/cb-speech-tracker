@@ -4,13 +4,18 @@
 
 ## 🚀 주요 기능
 
-- **멀티 뱅크 수집**: 5대 주요 중앙은행(미국, 유럽, 영국, 일본, 호주)의 연설문 자동 크롤링
-- **봇 차단 우회**: Playwright(Chromium)를 활용하여 RBA 등 강력한 보안이 적용된 사이트에서도 안정적으로 수집
-- **고성능 검색 (FTS5)**: 수천 건의 연설문 본문을 대상으로 특정 키워드(예: AI, Inflation)를 0.1초 내에 검색
-- **증분 업데이트**: 이미 수집된 URL은 건너뛰고 새로운 연설문만 스마트하게 추가
-- **간편한 데이터 관리**: 단일 SQLite DB 파일(`.db`)로 데이터를 관리하며, 나중에 PostgreSQL로의 이관도 매우 용이함
+- **자동 수집 파이프라인**: GitHub Actions를 통해 매일 한국 시간 새벽 3시에 최신 연설문을 자동으로 수집합니다.
+- **모니터링 대시보드**: 수집 현황, 시스템 상태, 화자 통계 등을 웹(GitHub Pages)에서 한눈에 확인할 수 있습니다.
+- **봇 차단 우회**: Playwright(Chromium)를 활용하여 RBA 등 보안이 강력한 사이트에서도 안정적으로 데이터를 가져옵니다.
+- **고성능 검색 (FTS5)**: 수천 건의 연설문 본문을 대상으로 특정 키워드(예: AI, Inflation)를 0.1초 내에 검색합니다.
+- **증분 업데이트**: 이미 수집된 URL은 건너뛰고 새로운 연설문만 스마트하게 추가하여 DB를 유지합니다.
 
-## 🛠 설치 방법
+## 📊 모니터링 대시보드
+
+수집 상태와 통계는 아래 URL에서 확인할 수 있습니다:
+`https://roy8in.github.io/cb-speech-tracker/`
+
+## 🛠 설치 및 로컬 실행
 
 ```bash
 # 의존성 설치
@@ -18,37 +23,23 @@ pip install -r requirements.txt
 
 # Playwright 브라우저 설치 (RBA 수집용)
 playwright install chromium
-```
 
-## 📖 사용 방법
-
-### 1. 데이터 수집 실행
-모든 중앙은행의 2025년 이후 연설문을 수집하여 DB에 저장합니다.
-```bash
+# 로컬에서 수집 실행
 python3 main.py
-```
 
-### 2. 키워드 검색 (Python)
-```python
-from src.models import SpeechDB
-
-db = SpeechDB()
-results = db.search_speeches('AI')
-
-for r in results:
-    print(f"[{r['bank_code']}] {r['date']} | {r['title']}")
-```
-
-### 3. 데이터 내보내기 (CSV)
-```bash
-python3 src/exporter.py --format csv
+# 대시보드용 데이터 생성
+python3 src/generate_dashboard_data.py
 ```
 
 ## 📂 데이터베이스 구조 (SQLite)
 
 - **`speeches`**: 원본 데이터 (은행 코드, 화자, 제목, 날짜, URL, 본문 전문)
 - **`speeches_fts`**: 전문 검색(Full-Text Search) 전용 가상 테이블
-- **`members`**: 중앙은행 위원 정보
+- **`collection_logs`**: 수집 실행 기록 및 에러 로그
+
+## 🤖 자동화 설정 (GitHub Actions)
+
+이 프로젝트는 `.github/workflows/scrape.yml` 설정을 통해 매일 자동으로 실행됩니다. 수집된 데이터(`.db`)와 통계(`.json`)는 저장소에 자동으로 커밋되어 데이터가 유실되지 않고 계속 축적됩니다.
 
 ## ⚖️ 라이선스
 이 프로젝트는 교육 및 연구 목적으로 제작되었습니다. 수집된 데이터의 저작권은 각 중앙은행에 있습니다.
