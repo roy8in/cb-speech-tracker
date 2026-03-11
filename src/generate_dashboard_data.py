@@ -1,13 +1,12 @@
 """
 Generates dashboard_data.json for the GitHub Pages dashboard.
-Extracts stats, health status, and speaker lists from the SQLite DB.
+Extracts stats, health status, and recent speeches from the SQLite DB.
 """
 
 import json
-import os
 import sqlite3
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # 프로젝트 루트 경로 설정
 ROOT_DIR = Path(__file__).parent.parent
@@ -23,8 +22,9 @@ def generate_data():
     conn.row_factory = sqlite3.Row
     
     try:
-        # 1. 은행별 통계
-        bank_stats = {}
+        # 1. 은행별 통계 (모든 은행 강제 포함)
+        banks = ['FRB', 'ECB', 'BOE', 'BOJ', 'RBA', 'BOC']
+        bank_stats = {bank: 0 for bank in banks}
         rows = conn.execute("SELECT bank_code, COUNT(*) as count FROM speeches GROUP BY bank_code").fetchall()
         for r in rows:
             bank_stats[r['bank_code']] = r['count']
@@ -41,15 +41,23 @@ def generate_data():
                 'error': r['error_message']
             })
             
-        # 3. 화자 목록 (은행별)
-        speakers = {}
-        rows = conn.execute("SELECT bank_code, speaker, COUNT(*) as count FROM speeches WHERE speaker IS NOT NULL GROUP BY bank_code, speaker ORDER BY count DESC").fetchall()
+        # 3. 최근 7일간의 연설 (New!)
+        seven_days_ago = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+        recent_speeches = []
+        rows = conn.execute("""
+            SELECT bank_code, speaker, title, date, url 
+            FROM speeches 
+            WHERE date >= ? 
+            ORDER BY date DESC, fetched_at DESC
+        """, (seven_days_ago,)).fetchall()
+        
         for r in rows:
-            if r['bank_code'] not in speakers:
-                speakers[r['bank_code']] = []
-            speakers[r['bank_code']].append({
-                'name': r['speaker'],
-                'count': r['count']
+            recent_speeches.append({
+                'bank': r['bank_code'],
+                'speaker': r['speaker'],
+                'title': r['title'],
+                'date': r['date'],
+                'url': r['url']
             })
             
         # 4. 전체 요약
@@ -60,7 +68,7 @@ def generate_data():
             'total_speeches': total_speeches,
             'bank_stats': bank_stats,
             'recent_logs': logs,
-            'speakers': speakers,
+            'recent_speeches': recent_speeches,
             'health': logs[0]['status'] if logs else 'unknown'
         }
         

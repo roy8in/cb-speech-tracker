@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-03-12T01:59:21.830321",
+  "last_updated": "2026-03-12T02:02:07.673058",
   "total_speeches": 524,
   "bank_stats": {
-    "BOC": 44,
+    "FRB": 134,
+    "ECB": 113,
     "BOE": 115,
     "BOJ": 36,
-    "ECB": 113,
-    "FRB": 134,
-    "RBA": 82
+    "RBA": 82,
+    "BOC": 44
   },
   "recent_logs": [
     {
@@ -32,133 +32,21 @@
       "error": null
     }
   ],
-  "speakers": {
-    "ECB": [
-      {
-        "name": "Christine Lagarde",
-        "count": 33
-      },
-      {
-        "name": "Piero Cipollone",
-        "count": 22
-      },
-      {
-        "name": "Philip R. Lane",
-        "count": 21
-      },
-      {
-        "name": "Isabel Schnabel",
-        "count": 14
-      },
-      {
-        "name": "Frank Elderson",
-        "count": 10
-      },
-      {
-        "name": "Luis de Guindos",
-        "count": 9
-      },
-      {
-        "name": "",
-        "count": 3
-      },
-      {
-        "name": "Christine Lagarde,Philip R. Lane",
-        "count": 1
-      }
-    ],
-    "RBA": [
-      {
-        "name": "Assistant Governor",
-        "count": 32
-      },
-      {
-        "name": "Governor",
-        "count": 26
-      },
-      {
-        "name": "Deputy Governor",
-        "count": 15
-      },
-      {
-        "name": "Senior Officer",
-        "count": 9
-      }
-    ],
-    "BOC": [
-      {
-        "name": "Tiff Macklem",
-        "count": 27
-      },
-      {
-        "name": "Sharon Kozicki",
-        "count": 3
-      },
-      {
-        "name": "Carolyn Rogers",
-        "count": 2
-      },
-      {
-        "name": "Nicolas Vincent",
-        "count": 2
-      },
-      {
-        "name": "Rhys R. Mendes",
-        "count": 2
-      },
-      {
-        "name": "Ron Morrow",
-        "count": 2
-      },
-      {
-        "name": "Toni Gravelle",
-        "count": 2
-      }
-    ],
-    "FRB": [
-      {
-        "name": "Bowman",
-        "count": 26
-      },
-      {
-        "name": "Barr",
-        "count": 25
-      },
-      {
-        "name": "Waller",
-        "count": 23
-      },
-      {
-        "name": "Jefferson",
-        "count": 15
-      },
-      {
-        "name": "Kugler",
-        "count": 14
-      },
-      {
-        "name": "Cook",
-        "count": 13
-      },
-      {
-        "name": "Powell",
-        "count": 13
-      },
-      {
-        "name": "Miran",
-        "count": 5
-      }
-    ],
-    "BOJ": [
-      {
-        "name": "Opening Remarks",
-        "count": 1
-      },
-      {
-        "name": "Wage Increases",
-        "count": 1
-      }
-    ]
-  },
+  "recent_speeches": [
+    {
+      "bank": "RBA",
+      "speaker": "Deputy Governor",
+      "title": "On the Safe-haven Status of the US Dollar",
+      "date": "2026-03-07",
+      "url": "https://www.rba.gov.au/speeches/2026/sp-dg-2026-03-07.html"
+    },
+    {
+      "bank": "BOC",
+      "speaker": null,
+      "title": "Bank of Canada, Export Development Canada, RBC and TD successfully complete bond issuance experiment  using distributed ledger technology",
+      "date": "2026-03-05",
+      "url": "https://www.bankofcanada.ca/2026/03/bank-canada-export-development-canada-rbc-td-successfully-complete-bond-issuance-experiment-distributed-ledger-technology/"
+    }
+  ],
   "health": "success"
 }

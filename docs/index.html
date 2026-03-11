@@ -18,7 +18,7 @@
             --accent-orange: #f59e0b;
         }
 
-        * { margin: 0; padding: 0; box-box: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             background-color: var(--bg-color); 
             color: var(--text-main);
@@ -59,27 +59,20 @@
 
         .grid-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 1rem;
             margin-bottom: 2rem;
         }
 
         .stat-card {
             background: var(--card-bg);
-            padding: 1.5rem;
+            padding: 1.25rem;
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            transition: transform 0.2s;
+            text-align: center;
         }
-        .stat-card:hover { transform: translateY(-2px); border-color: var(--accent-blue); }
         .stat-label { color: var(--text-dim); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem; }
-        .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--text-main); }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
-        }
+        .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
 
         section {
             background: var(--card-bg);
@@ -91,27 +84,10 @@
 
         h2 { font-size: 1.1rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
 
-        .log-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-        .log-table th { text-align: left; padding: 0.75rem; color: var(--text-dim); border-bottom: 1px solid var(--border-color); }
-        .log-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-color); }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .data-table th { text-align: left; padding: 0.75rem; color: var(--text-dim); border-bottom: 1px solid var(--border-color); }
+        .data-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-color); }
         
-        .speaker-list {
-            max-height: 500px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .speaker-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem;
-            border-radius: 6px;
-            background: rgba(255,255,255,0.02);
-            font-size: 0.875rem;
-        }
-        .speaker-count { color: var(--accent-blue); font-weight: 700; }
-
         .bank-badge {
             font-size: 0.7rem;
             padding: 2px 6px;
@@ -119,14 +95,13 @@
             background: var(--accent-blue);
             color: white;
             font-weight: bold;
+            display: inline-block;
         }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        .speech-link { color: var(--text-main); text-decoration: none; font-weight: 500; }
+        .speech-link:hover { color: var(--accent-blue); text-decoration: underline; }
 
-        @media (max-width: 768px) {
-            .main-content { grid-template-columns: 1fr; }
-        }
+        footer { text-align: center; color: var(--text-dim); font-size: 0.75rem; margin-top: 2rem; }
     </style>
 </head>
 <body>
@@ -140,40 +115,40 @@
         </header>
 
         <div class="grid-stats" id="bank-stats-grid">
-            <!-- Stats will be loaded here -->
+            <!-- Stats Grid -->
         </div>
 
-        <div class="main-content">
-            <div class="left-col">
-                <section>
-                    <h2>📋 Recent Collection Logs</h2>
-                    <table class="log-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>New Items</th>
-                                <th>Details</th>
-                            </tr>
-                        </thead>
-                        <tbody id="log-body">
-                            <!-- Logs will be loaded here -->
-                        </tbody>
-                    </table>
-                </section>
-            </div>
+        <section>
+            <h2>📋 Recent Collection Logs</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>New Items</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody id="log-body"></tbody>
+            </table>
+        </section>
 
-            <div class="right-col">
-                <section>
-                    <h2>👤 Top Speakers</h2>
-                    <div id="speaker-list" class="speaker-list">
-                        <!-- Speakers will be loaded here -->
-                    </div>
-                </section>
-            </div>
-        </div>
+        <section>
+            <h2>🎙️ Recent Speeches (Last 7 Days)</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">Bank</th>
+                        <th style="width: 150px;">Speaker</th>
+                        <th>Title</th>
+                        <th style="width: 120px;">Date</th>
+                    </tr>
+                </thead>
+                <tbody id="speech-body"></tbody>
+            </table>
+        </section>
 
-        <footer style="text-align: center; color: var(--text-dim); font-size: 0.75rem; margin-top: 2rem;">
+        <footer>
             Last Sync: <span id="last-updated">-</span>
         </footer>
     </div>
@@ -184,35 +159,25 @@
                 const response = await fetch('data.json');
                 const data = await response.json();
 
-                // 1. Update Status & Last Updated
+                // 1. Status
                 const healthEl = document.getElementById('health-status');
-                const statusText = document.getElementById('status-text');
-                const lastUpdated = document.getElementById('last-updated');
-                
-                if (data.health === 'success') {
-                    healthEl.className = 'status-badge status-success';
-                    statusText.innerText = 'All Systems Operational';
-                } else {
-                    healthEl.className = 'status-badge status-failed';
-                    statusText.innerText = 'Issues Detected';
-                }
-                lastUpdated.innerText = new Date(data.last_updated).toLocaleString();
+                document.getElementById('status-text').innerText = data.health === 'success' ? 'All Systems Operational' : 'Issues Detected';
+                healthEl.className = 'status-badge ' + (data.health === 'success' ? 'status-success' : 'status-failed');
+                document.getElementById('last-updated').innerText = new Date(data.last_updated).toLocaleString();
 
-                // 2. Update Bank Stats Grid
+                // 2. Stats Grid (Including BOC)
                 const statsGrid = document.getElementById('bank-stats-grid');
-                statsGrid.innerHTML = `
-                    <div class="stat-card">
-                        <div class="stat-label">Total Archive</div>
-                        <div class="stat-value">${data.total_speeches.toLocaleString()}</div>
-                    </div>
-                ` + Object.entries(data.bank_stats).map(([bank, count]) => `
-                    <div class="stat-card">
-                        <div class="stat-label">${bank}</div>
-                        <div class="stat-value">${count.toLocaleString()}</div>
-                    </div>
-                `).join('');
+                let statsHtml = `<div class="stat-card"><div class="stat-label">Total</div><div class="stat-value">${data.total_speeches.toLocaleString()}</div></div>`;
+                
+                // 정해진 순서대로 출력 (FRB, ECB, BOE, BOJ, RBA, BOC)
+                const bankOrder = ['FRB', 'ECB', 'BOE', 'BOJ', 'RBA', 'BOC'];
+                bankOrder.forEach(bank => {
+                    const count = data.bank_stats[bank] || 0;
+                    statsHtml += `<div class="stat-card"><div class="stat-label">${bank}</div><div class="stat-value">${count.toLocaleString()}</div></div>`;
+                });
+                statsGrid.innerHTML = statsHtml;
 
-                // 3. Update Logs
+                // 3. Logs
                 const logBody = document.getElementById('log-body');
                 logBody.innerHTML = data.recent_logs.map(log => `
                     <tr>
@@ -223,29 +188,26 @@
                     </tr>
                 `).join('');
 
-                // 4. Update Speakers
-                const speakerList = document.getElementById('speaker-list');
-                let allSpeakers = [];
-                Object.entries(data.speakers).forEach(([bank, list]) => {
-                    list.forEach(s => allSpeakers.push({...s, bank}));
-                });
-                allSpeakers.sort((a, b) => b.count - a.count);
-
-                speakerList.innerHTML = allSpeakers.slice(0, 30).map(s => `
-                    <div class="speaker-item">
-                        <span><span class="bank-badge">${s.bank}</span> ${s.name || 'Unknown'}</span>
-                        <span class="speaker-count">${s.count}</span>
-                    </div>
-                `).join('');
+                // 4. Recent Speeches (Last 7 Days)
+                const speechBody = document.getElementById('speech-body');
+                if (data.recent_speeches && data.recent_speeches.length > 0) {
+                    speechBody.innerHTML = data.recent_speeches.map(s => `
+                        <tr>
+                            <td><span class="bank-badge">${s.bank}</span></td>
+                            <td style="font-weight: 600;">${s.speaker || '-'}</td>
+                            <td><a href="${s.url}" target="_blank" class="speech-link">${s.title}</a></td>
+                            <td>${s.date}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    speechBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-dim);">No speeches found in the last 7 days.</td></tr>';
+                }
 
             } catch (error) {
-                console.error('Error loading dashboard data:', error);
-                document.getElementById('status-text').innerText = 'Data Load Error';
+                console.error('Error:', error);
             }
         }
-
         loadData();
-        // Refresh every 5 minutes
         setInterval(loadData, 300000);
     </script>
 </body>
