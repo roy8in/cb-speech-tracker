@@ -129,7 +129,7 @@ class ECBScraper(BaseScraper):
             full_text = speech_info.pop('_full_text', None)
 
             speech_id = self.db.insert_speech(
-                bank=self.BANK_CODE,
+                bank_code=self.BANK_CODE,
                 speaker=speech_info.get('speaker'),
                 title=speech_info['title'],
                 date=speech_info['date'],

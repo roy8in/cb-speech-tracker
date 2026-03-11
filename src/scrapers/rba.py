@@ -3,33 +3,51 @@ Reserve Bank of Australia (RBA) Speech Scraper
 
 Source: https://www.rba.gov.au/speeches/
 Note: RBA blocks direct requests to year subpages (403).
-      We scrape the main speeches page which lists all speeches by year.
+      Uses Playwright to bypass bot detection.
 """
 
 import re
 import logging
+import time
+from playwright.sync_api import sync_playwright
 from .base import BaseScraper
 
 logger = logging.getLogger(__name__)
-
 
 class RBAScraper(BaseScraper):
     BANK_CODE = 'RBA'
     BANK_NAME = 'Reserve Bank of Australia'
     BASE_URL = 'https://www.rba.gov.au'
 
+    def _get_playwright(self, url):
+        """Use Playwright to get page content."""
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(user_agent=self.HEADERS['User-Agent'])
+            page = context.new_page()
+            try:
+                page.goto(url, wait_until='networkidle')
+                # Wait a bit for potential JS redirects
+                time.sleep(2)
+                content = page.content()
+                return content
+            except Exception as e:
+                logger.error(f"[{self.BANK_CODE}] Playwright failed for {url}: {e}")
+                return None
+            finally:
+                browser.close()
+
     def fetch_speech_list(self, year=None):
-        """Fetch list of RBA speeches from the main speeches page."""
-        # RBA blocks year-specific pages, so always fetch the main page
+        """Fetch list of RBA speeches using Playwright."""
         url = f"{self.BASE_URL}/speeches/"
-        resp = self._get(url)
-        if not resp:
+        html = self._get_playwright(url)
+        if not html:
             return []
 
-        soup = self._parse_html(resp.text)
+        soup = self._parse_html(html)
         speeches = []
 
-        # RBA lists speeches as links with URLs like /speeches/YYYY/sp-xxx-YYYY-MM-DD.html
+        # RBA lists speeches in a table or list
         for link in soup.find_all('a', href=True):
             href = link['href']
             title = link.get_text(strip=True)
@@ -37,12 +55,10 @@ class RBAScraper(BaseScraper):
             if not title or len(title) < 10:
                 continue
 
-            # Only match actual speech links
             if '/speeches/' not in href:
                 continue
             if not href.endswith('.html') and not href.endswith('.htm'):
                 continue
-            # Skip index/navigation links
             if href.endswith('index.html') or href == '/speeches/':
                 continue
 
@@ -54,17 +70,16 @@ class RBAScraper(BaseScraper):
             else:
                 speech_url = f"{self.BASE_URL}/speeches/{href}"
 
-            # Extract date from URL: sp-xxx-YYYY-MM-DD.html or mc-xxx-YYYY-MM-DD.html
+            # Extract date from URL
             date_match = re.search(r'(\d{4})-(\d{2})-(\d{2})', href)
             date = ''
             if date_match:
                 date = f"{date_match.group(1)}-{date_match.group(2)}-{date_match.group(3)}"
 
-            # Filter by year if specified
             if year and date and not date.startswith(str(year)):
                 continue
 
-            # Extract speaker code from URL: sp-gov, sp-dg, sp-ag, sp-so, mc-gov
+            # Extract speaker (Governor, Deputy Governor, etc.)
             speaker = None
             speaker_match = re.search(r'(sp|mc)-(gov|dg|ag|so)-', href)
             if speaker_match:
@@ -96,12 +111,11 @@ class RBAScraper(BaseScraper):
 
     def fetch_speech_text(self, url):
         """Fetch the full text of an RBA speech."""
-        resp = self._get(url)
-        if not resp:
+        html = self._get_playwright(url)
+        if not html:
             return None
 
-        soup = self._parse_html(resp.text)
-
+        soup = self._parse_html(html)
         content = (
             soup.find('div', id='content') or
             soup.find('article') or
@@ -110,18 +124,13 @@ class RBAScraper(BaseScraper):
         )
 
         if content:
-            for tag in content.find_all(['nav', 'header', 'footer', 'script', 'style',
-                                          'aside', 'button', 'form']):
+            for tag in content.find_all(['nav', 'header', 'footer', 'script', 'style', 'aside']):
                 tag.decompose()
             return content.get_text(separator='\n', strip=True)
 
         return None
 
     def get_all_speeches(self, start_year=None, end_year=None):
-        """
-        RBA main page lists all speeches across years.
-        Override to fetch from main page and filter.
-        """
         all_speeches = self.fetch_speech_list()
         if start_year:
             all_speeches = [s for s in all_speeches if s['date'] >= f"{start_year}-01-01"]
