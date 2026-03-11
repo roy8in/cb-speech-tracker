@@ -1,8 +1,7 @@
 """
-Bank of Japan (BOJ) Speech Scraper — English version
+Bank of Japan (BOJ) Speech Scraper
 
-Source: https://www.boj.or.jp/en/announcements/press/koen.htm
-Year index: https://www.boj.or.jp/en/announcements/press/koen/koen{YYYY}.htm
+Source: https://www.boj.or.jp/en/about/press/koen_year/index.htm
 """
 
 import re
@@ -18,12 +17,10 @@ class BOJScraper(BaseScraper):
     BASE_URL = 'https://www.boj.or.jp'
 
     def fetch_speech_list(self, year=None):
-        """Fetch list of BOJ speeches (English) for a given year."""
-        if year is None:
-            from datetime import datetime
-            year = datetime.now().year
-
-        url = f"{self.BASE_URL}/en/about/press/koen_{year}/index.htm"
+        """Fetch list of BOJ speeches for a given year."""
+        year_str = str(year) if year else "2026"
+        url = f"{self.BASE_URL}/en/about/press/koen_{year_str}/index.htm"
+        
         resp = self._get(url)
         if not resp:
             return []
@@ -31,137 +28,104 @@ class BOJScraper(BaseScraper):
         soup = self._parse_html(resp.text)
         speeches = []
 
-        # BOJ uses table or list format for speeches
-        # Try table rows first
-        rows = soup.select('table tr, .list-data li, .list01 li, div.what_new li')
+        # BOJ lists speeches in a section with class 'section' or 'main'
+        container = soup.find('div', id='main') or soup.find('div', class_='section')
+        if not container:
+            return []
 
-        if not rows:
-            # Alternative: look for all links in the main content
-            content = soup.find('div', id='main') or soup.find('main') or soup
-            rows = content.find_all(['tr', 'li'])
-
-        for row in rows:
-            try:
-                link = row.find('a', href=True)
-                if not link:
-                    continue
-
-                title = link.get_text(strip=True)
-                if not title or len(title) < 5:
-                    continue
-
-                href = link['href']
-                if href.startswith('/'):
-                    speech_url = f"{self.BASE_URL}{href}"
-                elif href.startswith('http'):
-                    speech_url = href
-                else:
-                    speech_url = f"{self.BASE_URL}/en/about/press/koen_{year}/{href}"
-
-                # Skip non-speech links
-                if not any(x in href.lower() for x in ['koen', 'ko2', 'press', 'speech']):
-                    if not href.endswith('.htm') and not href.endswith('.html'):
-                        continue
-
-                # Date extraction
-                date = self._extract_date(row, href, year)
-
-                # Speaker extraction
-                speaker = self._extract_speaker(row, title)
-
-                speeches.append({
-                    'title': title,
-                    'date': date,
-                    'url': speech_url,
-                    'speaker': speaker,
-                })
-            except Exception as e:
-                logger.warning(f"[BOJ] Error parsing entry: {e}")
+        for li in container.find_all('li'):
+            link = li.find('a', href=True)
+            if not link:
                 continue
+
+            title = link.get_text(strip=True)
+            href = link['href']
+
+            if not title or len(title) < 5:
+                continue
+
+            # BOJ speech links usually start with /en/about/press/koen_YYYY/
+            if '/koen_' not in href:
+                continue
+
+            # Build absolute URL
+            speech_url = f"{self.BASE_URL}{href}" if href.startswith('/') else href
+
+            # Extract date from the list item text (e.g., "Mar.  3, 2026")
+            date_text = li.get_text(strip=True)
+            date = self._parse_boj_date(date_text)
+            
+            # Extract speaker from title parentheses if present
+            speaker = None
+            # Pattern: (Speech by Governor UEDA Kazuo)
+            m = re.search(r'\((?:Speech|Remarks|Address)\s+by\s+(?:Governor\s+|Deputy Governor\s+)?([^)]+)\)', title, re.IGNORECASE)
+            if m:
+                speaker = m.group(1).strip()
+
+            speeches.append({
+                'title': title,
+                'date': date or f"{year_str}-01-01",
+                'url': speech_url,
+                'speaker': speaker,
+            })
 
         return speeches
 
-    def _extract_date(self, row, href, year):
-        """Extract date from row text or URL."""
+    def _parse_boj_date(self, text):
+        """Parse BOJ date format (e.g., 'Mar. 3, 2026')."""
         from datetime import datetime
-
-        # Try date element
-        date_tag = row.find('time') or row.find(class_=re.compile(r'date'))
-        if date_tag:
-            date_str = date_tag.get('datetime', '') or date_tag.get_text(strip=True)
-            for fmt in ['%Y-%m-%d', '%B %d, %Y', '%Y/%m/%d']:
+        # Regex to find something like "Mar. 3, 2026"
+        match = re.search(r'([A-Za-z]+\.?\s+\d{1,2},\s+\d{4})', text)
+        if match:
+            date_str = match.group(1).replace('.', '')
+            for fmt in ['%b %d, %Y', '%B %d, %Y']:
                 try:
-                    dt = datetime.strptime(date_str.strip()[:10], fmt)
+                    dt = datetime.strptime(date_str, fmt)
                     return dt.strftime('%Y-%m-%d')
                 except ValueError:
                     continue
-
-        # Try from URL: ko{YYMMDD} or ko{YYYYMMDD}
-        match = re.search(r'ko(\d{6,8})', href)
-        if match:
-            d = match.group(1)
-            if len(d) == 6:
-                return f"20{d[:2]}-{d[2:4]}-{d[4:6]}"
-            elif len(d) == 8:
-                return f"{d[:4]}-{d[4:6]}-{d[6:8]}"
-
-        # Try text content for date patterns like "March 5, 2026"
-        text = row.get_text()
-        date_match = re.search(
-            r'(\w+)\s+(\d{1,2}),?\s+(\d{4})', text)
-        if date_match:
-            try:
-                dt = datetime.strptime(
-                    f"{date_match.group(1)} {date_match.group(2)}, {date_match.group(3)}",
-                    "%B %d, %Y")
-                return dt.strftime('%Y-%m-%d')
-            except ValueError:
-                pass
-
-        return f"{year}-01-01"
-
-    def _extract_speaker(self, row, title):
-        """Extract speaker from row or title."""
-        text = row.get_text()
-
-        # Common BOJ speaker patterns
-        patterns = [
-            r'(?:Governor|Deputy Governor|Board Member|Chairman)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)',
-            r'by\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)',
-        ]
-        for p in patterns:
-            match = re.search(p, text)
-            if match:
-                return match.group(1).strip()
-
         return None
 
     def fetch_speech_text(self, url):
-        """Fetch the full text of a BOJ speech (English)."""
+        """Fetch the full text and extract speaker from the body."""
         resp = self._get(url)
         if not resp:
             return None
 
         soup = self._parse_html(resp.text)
-
-        content = (
-            soup.find('div', id='main') or
-            soup.find('div', class_='content') or
-            soup.find('article') or
-            soup.find('main')
-        )
-
+        content = soup.find('div', id='main') or soup.find('div', class_='section') or soup.find('main')
+        
         if content:
-            for tag in content.find_all(['nav', 'header', 'footer', 'script', 'style',
-                                          'aside', 'button', 'form']):
+            # 1. Extract speaker from the first few paragraphs
+            # Pattern: UEDA Kazuo Governor of the Bank of Japan
+            speaker = None
+            first_p = content.find('p')
+            if first_p:
+                p_text = first_p.get_text(strip=True)
+                # Look for name before "Governor" or "Deputy Governor"
+                m = re.search(r'^([^,]+?)\s+(?:Governor|Deputy Governor)', p_text)
+                if m:
+                    speaker = m.group(1).strip()
+            
+            for tag in content.find_all(['nav', 'header', 'footer', 'script', 'style', 'aside']):
                 tag.decompose()
-            return content.get_text(separator='\n', strip=True)
-
+            
+            text = content.get_text(separator='\n', strip=True)
+            if speaker:
+                return f"__SPEAKER__:{speaker}\n{text}"
+            return text
+            
         return None
 
     def get_all_speeches(self, start_year=None, end_year=None):
-        """BOJ English speeches available from ~2000."""
-        return super().get_all_speeches(
-            start_year=start_year or 2000,
-            end_year=end_year,
-        )
+        from datetime import datetime
+        current_year = datetime.now().year
+        start = start_year or 2019
+        end = end_year or current_year
+
+        all_speeches = []
+        for year in range(end, start - 1, -1):
+            speeches = self.fetch_speech_list(year=year)
+            if speeches:
+                all_speeches.extend(speeches)
+        return all_speeches

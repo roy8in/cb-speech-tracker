@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-12T07:51:24.480750",
+  "last_updated": "2026-03-12T08:05:27.333230",
   "total_speeches": 2097,
   "bank_stats": {
     "FRB": 577,
@@ -63,7 +63,7 @@
     },
     {
       "bank": "RBA",
-      "speaker": "Deputy Governor",
+      "speaker": "Deputy",
       "title": "On the Safe-haven Status of the US Dollar",
       "date": "2026-03-07",
       "url": "https://www.rba.gov.au/speeches/2026/sp-dg-2026-03-07.html"
@@ -91,21 +91,21 @@
     },
     {
       "bank": "RBA",
-      "speaker": "Governor",
+      "speaker": "",
       "title": "Q&A Transcript",
       "date": "2026-03-03",
       "url": "https://www.rba.gov.au/speeches/2026/sp-gov-2026-03-03-q-and-a-transcript.html"
     },
     {
       "bank": "RBA",
-      "speaker": "Governor",
+      "speaker": "",
       "title": "Listening to Australians, Interpreting the Data and Setting Monetary Policy",
       "date": "2026-03-03",
       "url": "https://www.rba.gov.au/speeches/2026/sp-gov-2026-03-03.html"
     },
     {
       "bank": "BOJ",
-      "speaker": null,
+      "speaker": "UEDA Kazuo",
       "title": "\"The New Financial Ecosystem and the Role of Central Banks\" (Remarks at the FIN/SUM 2026)",
       "date": "2026-03-03",
       "url": "https://www.boj.or.jp/en/about/press/koen_2026/ko260303a.htm"
@@ -133,14 +133,14 @@
     },
     {
       "bank": "RBA",
-      "speaker": "Assistant Governor",
+      "speaker": "Assistant",
       "title": "Recent Refinements to the Dual Mandate and Navigating Back to Target",
       "date": "2026-03-02",
       "url": "https://www.rba.gov.au/speeches/2026/sp-ag-2026-03-02.html"
     },
     {
       "bank": "BOJ",
-      "speaker": null,
+      "speaker": "HIMINO Ryozo",
       "title": "\"Japan's Economy and Monetary Policy\" (Speech at a Meeting with Local Leaders in Wakayama)",
       "date": "2026-03-02",
       "url": "https://www.boj.or.jp/en/about/press/koen_2026/ko260302a.htm"
@@ -161,7 +161,7 @@
     },
     {
       "bank": "BOJ",
-      "speaker": null,
+      "speaker": "TAKATA Hajime",
       "title": "\"Economic Activity, Prices, and Monetary Policy in Japan\" (Speech at a Meeting with Local Leaders in Kyoto)",
       "date": "2026-02-26",
       "url": "https://www.boj.or.jp/en/about/press/koen_2026/ko260226a.htm"

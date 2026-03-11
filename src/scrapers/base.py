@@ -129,11 +129,18 @@ class BaseScraper(ABC):
             if fetch_text:
                 full_text = self.fetch_speech_text(url)
                 
-                # Check for embedded date info from specific scrapers (like BOE)
-                if full_text and full_text.startswith("__DATE__:"):
-                    parts = full_text.split("\n", 1)
-                    speech_info['date'] = parts[0].replace("__DATE__:", "").strip()
-                    full_text = parts[1] if len(parts) > 1 else ""
+                # Check for embedded metadata from specific scrapers
+                if full_text:
+                    lines = full_text.split("\n")
+                    new_text_lines = []
+                    for line in lines:
+                        if line.startswith("__DATE__:"):
+                            speech_info['date'] = line.replace("__DATE__:", "").strip()
+                        elif line.startswith("__SPEAKER__:"):
+                            speech_info['speaker'] = line.replace("__SPEAKER__:", "").strip()
+                        else:
+                            new_text_lines.append(line)
+                    full_text = "\n".join(new_text_lines).strip()
 
                 if full_text:
                     logger.info(f"[{self.BANK_CODE}] Fetched: {speech_info['title'][:60]}...")

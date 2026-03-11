@@ -27,7 +27,6 @@ class RBAScraper(BaseScraper):
             page = context.new_page()
             try:
                 page.goto(url, wait_until='networkidle')
-                # Wait a bit for potential JS redirects
                 time.sleep(2)
                 content = page.content()
                 return content
@@ -47,50 +46,48 @@ class RBAScraper(BaseScraper):
         soup = self._parse_html(html)
         speeches = []
 
-        # RBA lists speeches in a table or list
-        for link in soup.find_all('a', href=True):
+        # RBA structure: <li><a href="...">Title</a> - Speaker Name, Title (Date)</li>
+        for li in soup.find_all('li'):
+            link = li.find('a', href=True)
+            if not link:
+                continue
+                
             href = link['href']
             title = link.get_text(strip=True)
 
-            if not title or len(title) < 10:
+            if not title or '/speeches/' not in href or not (href.endswith('.html') or href.endswith('.htm')):
+                continue
+            if 'index.html' in href or href == '/speeches/':
                 continue
 
-            if '/speeches/' not in href:
-                continue
-            if not href.endswith('.html') and not href.endswith('.htm'):
-                continue
-            if href.endswith('index.html') or href == '/speeches/':
-                continue
+            # Full text of the li to extract speaker
+            full_text = li.get_text(separator=' ', strip=True)
+            
+            # 1. Extract speaker name
+            speaker = None
+            # Pattern: Title - Speaker Name, Title (Date)
+            # Find the part after the first dash and before the first comma
+            m = re.search(rf"{re.escape(title)}\s*[-–—]\s*([^,]+)", full_text)
+            if m:
+                speaker = m.group(1).strip()
+            
+            # Refine RBA speaker: remove job titles if still present
+            if speaker:
+                for job in ['Governor', 'Deputy Governor', 'Assistant Governor', 'Senior Officer']:
+                    if speaker.endswith(f" {job}"):
+                        speaker = speaker.replace(f" {job}", "").strip()
+                    if speaker.startswith(f"{job} "):
+                        speaker = speaker.replace(f"{job} ", "").strip()
 
-            # Build absolute URL
-            if href.startswith('/'):
-                speech_url = f"{self.BASE_URL}{href}"
-            elif href.startswith('http'):
-                speech_url = href
-            else:
-                speech_url = f"{self.BASE_URL}/speeches/{href}"
-
-            # Extract date from URL
+            # 2. Extract date
             date_match = re.search(r'(\d{4})-(\d{2})-(\d{2})', href)
-            date = ''
-            if date_match:
-                date = f"{date_match.group(1)}-{date_match.group(2)}-{date_match.group(3)}"
+            date = f"{date_match.group(1)}-{date_match.group(2)}-{date_match.group(3)}" if date_match else ''
 
             if year and date and not date.startswith(str(year)):
                 continue
 
-            # Extract speaker (Governor, Deputy Governor, etc.)
-            speaker = None
-            speaker_match = re.search(r'(sp|mc)-(gov|dg|ag|so)-', href)
-            if speaker_match:
-                speaker_code = speaker_match.group(2)
-                speaker_map = {
-                    'gov': 'Governor',
-                    'dg': 'Deputy Governor',
-                    'ag': 'Assistant Governor',
-                    'so': 'Senior Officer',
-                }
-                speaker = speaker_map.get(speaker_code, speaker_code)
+            # Build absolute URL
+            speech_url = f"{self.BASE_URL}{href}" if href.startswith('/') else href
 
             speeches.append({
                 'title': title,
@@ -112,22 +109,25 @@ class RBAScraper(BaseScraper):
     def fetch_speech_text(self, url):
         """Fetch the full text of an RBA speech."""
         html = self._get_playwright(url)
-        if not html:
-            return None
-
+        if not html: return None
         soup = self._parse_html(html)
-        content = (
-            soup.find('div', id='content') or
-            soup.find('article') or
-            soup.find('div', class_='rba-content') or
-            soup.find('main')
-        )
-
+        
+        # Detail page speaker extraction
+        speaker = None
+        byline = soup.find(['p', 'div'], class_=re.compile(r'byline|author|speaker'))
+        if byline:
+            text = byline.get_text(strip=True)
+            if ',' in text:
+                speaker = text.split(',')[0].strip()
+        
+        content = soup.find('div', id='content') or soup.find('article') or soup.find('main')
         if content:
             for tag in content.find_all(['nav', 'header', 'footer', 'script', 'style', 'aside']):
                 tag.decompose()
-            return content.get_text(separator='\n', strip=True)
-
+            text = content.get_text(separator='\n', strip=True)
+            if speaker:
+                return f"__SPEAKER__:{speaker}\n{text}"
+            return text
         return None
 
     def get_all_speeches(self, start_year=None, end_year=None):
