@@ -1,0 +1,31 @@
+﻿bank,speaker,date,title,hawk_dove_score,confidence,model_used
+FRB,Barr,2026-02-17,What Will Artificial Intelligence Mean for the Labor Market and the Economy?,0.18,0.821,finbert
+FRB,Bowman,2026-01-07,Modernizing Supervision and Regulation: 2025 and the Path Ahead,0.38,0.824,finbert
+FRB,Bowman,2026-01-16,Outlook for the Economy and Monetary Policy,-1.1,0.822,finbert
+FRB,Bowman,2026-01-30,Outlook for the Economy and Monetary Policy,-1.2,0.808,finbert
+FRB,Bowman,2026-02-16,"Revitalizing Bank Mortgage Lending, One Step with Basel",-0.26,0.814,finbert
+FRB,Bowman,2026-02-19,Opening Remarks,0.96,0.786,finbert
+FRB,Bowman,2026-02-26,Supervision and Regulation,0.98,0.778,finbert
+FRB,Bowman,2026-03-03,"Liquidity Resiliency, Financial Stability, and the Role of the Federal Reserve",-0.62,0.8,finbert
+ECB,Christine Lagarde,2026-02-09,"European Parliament plenary debate on the ECB Annual Report - Speech by Christine Lagarde, President of the ECB, at the plenary session of the European Parliament",1.76,0.785,finbert
+ECB,Christine Lagarde,2026-02-14,"Preparing for geoeconomic fragmentation - Opening remarks by Christine Lagarde, President of the ECB, at a roundtable discussion on “Chain Reaction: Navigating Geoeconomic Shifts and Dependencies” at the Munich Security Conference, Germany",-0.69,0.823,finbert
+ECB,Christine Lagarde,2026-02-20,"The order that took centuries to build - Acceptance speech by Christine Lagarde, President of the ECB, for the Wolfgang Friedmann Memorial Award 2026 at Columbia Law School in New York",-0.24,0.834,finbert
+ECB,Christine Lagarde,2026-02-23,"Turning size into scale: Europe’s new growth model - Acceptance speech by Christine Lagarde, President of the ECB, for the 2026 Paul A. Volcker Lifetime Achievement Award at the 42nd Annual NABE Economic Policy Conference in Washington DC, United States",0.45,0.821,finbert
+ECB,Christine Lagarde,2026-02-26,"Hearing of the Committee on Economic and Monetary Affairs of the European Parliament - Speech by Christine Lagarde, President of the ECB, at the Hearing of the Committee on Economic and Monetary Affairs of the European Parliament",0.18,0.83,finbert
+FRB,Cook,2026-02-04,Economic Outlook,-0.54,0.795,finbert
+FRB,Cook,2026-02-24,Opening Remarks for the âAI and Productivity across the Economyâ Panel,0.15,0.82,finbert
+ECB,Frank Elderson,2026-01-28,"Hearing of the Committee on Economic and Monetary Affairs of the European Parliament - Introductory statement by Frank Elderson, Member of the Executive Board of the ECB and Vice-Chair of the Supervisory Board of the ECB, at the Hearing of the Committee on Economic and Monetary Affairs of the European Parliament",2.87,0.802,finbert
+ECB,Isabel Schnabel,2026-02-11,"Made in Europe - Speech by Isabel Schnabel, Member of the Executive Board of the ECB, at a lecture in memory of Eugen Böhm von Bawerk, Österreichische Akademie der Wissenschaften",0.34,0.811,finbert
+FRB,Jefferson,2026-01-16,Economic Outlook and Monetary Policy Implementation,-0.1,0.814,finbert
+FRB,Jefferson,2026-02-06,Economic Outlook and Supply-Side (Dis)Inflation Dynamics,1.09,0.827,finbert
+ECB,Luis de Guindos,2026-01-14,"Monetary policy and financial stability in the euro area - Speech by Luis de Guindos, Vice-President of the ECB, at the 16th edition of Spain Investors Day",-0.58,0.824,finbert
+FRB,Miran,2026-01-14,"Regulations, the Supply Side, and Monetary Policy",-0.37,0.819,finbert
+ECB,Philip R. Lane,2026-01-09,"The euro in a changing world - Keynote speech by Philip R. Lane, Member of the Executive Board of the ECB, at the Danish Economic Society Conference",0.89,0.829,finbert
+ECB,Philip R. Lane,2026-02-12,"Bulgaria and the euro - Keynote speech by Philip R. Lane, Member of the Executive Board of the ECB, at The World Ahead 2026: Sofia Gala Dinner",1.8,0.83,finbert
+ECB,Piero Cipollone,2026-02-06,"The digital euro: strengthening Europe’s payments ecosystem - Speech by Piero Cipollone, Member of the Executive Board of the ECB, at the event “The digital euro in Cyprus”",1.09,0.807,finbert
+ECB,Piero Cipollone,2026-02-12,"Europe and monetary sovereignty - Speech by Piero Cipollone, Member of the Executive Board of the ECB, at the Accademia Nazionale dei Lincei",0.54,0.811,finbert
+ECB,Piero Cipollone,2026-02-19,"The digital euro: enhancing payments in the euro area - Speech by Piero Cipollone, Member of the Executive Board of the ECB, at the Italian Parliamentary Committee of Inquiry into the Banking, Financial and Insurance System",1.05,0.808,finbert
+FRB,Powell,2026-01-11,Statement from Federal Reserve Chair Jerome H. Powell,0.2,0.821,finbert
+FRB,Waller,2026-01-30,Statement by Governor Christopher J. Waller,-3.17,0.79,finbert
+FRB,Waller,2026-02-23,Labor Market Data: Signal or Noise?,-1.4,0.79,finbert
+FRB,Waller,2026-02-24,Operationalizing AI at the Federal Reserve,0.31,0.841,finbert
