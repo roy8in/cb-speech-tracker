@@ -54,6 +54,11 @@ class BaseScraper(ABC):
         try:
             resp = self.session.get(url, timeout=self.REQUEST_TIMEOUT, verify=False, **kwargs)
             resp.raise_for_status()
+            
+            # Prevent requests from defaulting to ISO-8859-1 for text/html without charset
+            if resp.encoding is None or resp.encoding.lower() == 'iso-8859-1':
+                resp.encoding = resp.apparent_encoding or 'utf-8'
+                
             return resp
         except requests.RequestException as e:
             logger.error(f"[{self.BANK_CODE}] Request failed for {url}: {e}")

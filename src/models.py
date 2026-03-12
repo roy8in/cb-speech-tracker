@@ -41,7 +41,7 @@ class SpeechDB:
                 CREATE TABLE IF NOT EXISTS speeches (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     bank_code TEXT NOT NULL,
-                    speaker TEXT,
+                    speaker_id INTEGER,
                     title TEXT NOT NULL,
                     date TEXT NOT NULL,
                     url TEXT UNIQUE NOT NULL,
@@ -49,7 +49,8 @@ class SpeechDB:
                     speech_type TEXT DEFAULT 'speech',
                     language TEXT DEFAULT 'en',
                     fetched_at TEXT NOT NULL,
-                    created_at TEXT DEFAULT (datetime('now'))
+                    created_at TEXT DEFAULT (datetime('now')),
+                    FOREIGN KEY (speaker_id) REFERENCES members (id)
                 );
 
                 CREATE TABLE IF NOT EXISTS members (
@@ -63,7 +64,7 @@ class SpeechDB:
 
                 CREATE INDEX IF NOT EXISTS idx_speeches_bank ON speeches(bank_code);
                 CREATE INDEX IF NOT EXISTS idx_speeches_date ON speeches(date);
-                CREATE INDEX IF NOT EXISTS idx_speeches_speaker ON speeches(speaker);
+                CREATE INDEX IF NOT EXISTS idx_speeches_speaker ON speeches(speaker_id);
 
                 -- 3. 수집 로그 테이블
                 CREATE TABLE IF NOT EXISTS collection_logs (
@@ -101,15 +102,32 @@ class SpeechDB:
         finally:
             conn.close()
 
+    def get_or_create_member(self, bank_code, name):
+        """회원 ID를 반환하거나 없으면 생성"""
+        if not name:
+            return None
+        conn = self._get_conn()
+        try:
+            cursor = conn.execute("SELECT id FROM members WHERE bank_code = ? AND name = ?", (bank_code, name))
+            row = cursor.fetchone()
+            if row:
+                return row['id']
+            cursor = conn.execute("INSERT INTO members (bank_code, name) VALUES (?, ?)", (bank_code, name))
+            conn.commit()
+            return cursor.lastrowid
+        finally:
+            conn.close()
+
     def insert_speech(self, bank_code, speaker, title, date, url, full_text=None, speech_type='speech', language='en'):
         """새 연설 삽입 (URL 중복 시 무시)"""
+        speaker_id = self.get_or_create_member(bank_code, speaker)
         conn = self._get_conn()
         try:
             cursor = conn.execute("""
                 INSERT OR IGNORE INTO speeches 
-                (bank_code, speaker, title, date, url, full_text, speech_type, language, fetched_at)
+                (bank_code, speaker_id, title, date, url, full_text, speech_type, language, fetched_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (bank_code, speaker, title, date, url, full_text, speech_type, language, datetime.now().isoformat()))
+            """, (bank_code, speaker_id, title, date, url, full_text, speech_type, language, datetime.now().isoformat()))
             conn.commit()
             return cursor.lastrowid if cursor.rowcount > 0 else None
         finally:
@@ -129,8 +147,9 @@ class SpeechDB:
         conn = self._get_conn()
         try:
             rows = conn.execute("""
-                SELECT s.bank_code, s.date, s.speaker, s.title 
+                SELECT s.bank_code, s.date, m.name as speaker, s.title 
                 FROM speeches s
+                LEFT JOIN members m ON s.speaker_id = m.id
                 JOIN speeches_fts f ON s.id = f.rowid
                 WHERE speeches_fts MATCH ?
                 ORDER BY rank
