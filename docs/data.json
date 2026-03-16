@@ -1,15 +1,22 @@
 {
-  "last_updated": "2026-03-16T09:11:28.405372",
-  "total_speeches": 2097,
+  "last_updated": "2026-03-16T00:22:47.324057",
+  "total_speeches": 2101,
   "bank_stats": {
-    "FRB": 577,
+    "FRB": 578,
     "ECB": 225,
-    "BOE": 654,
+    "BOE": 657,
     "BOJ": 213,
     "RBA": 142,
     "BOC": 286
   },
   "recent_logs": [
+    {
+      "started_at": "2026-03-16T00:19:46.605216",
+      "finished_at": "2026-03-16T00:22:47.233835",
+      "status": "success",
+      "total_new": 4,
+      "error": null
+    },
     {
       "started_at": "2026-03-12T11:22:27.952387",
       "finished_at": "2026-03-12T11:26:24.158664",
@@ -37,22 +44,36 @@
       "status": "success",
       "total_new": 42,
       "error": null
-    },
-    {
-      "started_at": "2026-03-12T01:30:27.778066",
-      "finished_at": "2026-03-12T01:31:51.232039",
-      "status": "success",
-      "total_new": 0,
-      "error": null
     }
   ],
   "recent_speeches": [
+    {
+      "bank": "BOE",
+      "speaker": "Victoria Saporta",
+      "title": "Victoria Saporta: Remarks at the Money Markets Committee (to be published at 2pm)",
+      "date": "2026-03-27",
+      "url": "https://www.bankofengland.co.uk/speech/2026/march/victoria-saporta-remarks-at-the-money-markets-committee"
+    },
+    {
+      "bank": "BOE",
+      "speaker": "Alan Taylor",
+      "title": "Alan Taylor: Exante Data’s 10-year anniversary macro conference (to be published at 4pm GMT)",
+      "date": "2026-03-26",
+      "url": "https://www.bankofengland.co.uk/speech/2026/march/alan-taylor-exante-datas-10-year-anniversary-macro-conference"
+    },
     {
       "bank": "BOE",
       "speaker": "Phil Evans",
       "title": "Phil Evans: Speech at the University of Leeds ‘Modernising the liquidity framework for banks and building societies’ (to be published at 11.30am)",
       "date": "2026-03-17",
       "url": "https://www.bankofengland.co.uk/speech/2026/march/phil-evans-speech-at-the-university-of-leeds"
+    },
+    {
+      "bank": "FRB",
+      "speaker": "Bowman",
+      "title": "Capital Rules for the Real Economy",
+      "date": "2026-03-12",
+      "url": "https://www.federalreserve.gov/newsevents/speech/bowman20260312a.htm"
     },
     {
       "bank": "BOE",
