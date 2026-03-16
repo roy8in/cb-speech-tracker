@@ -32,7 +32,8 @@ jobs:
 
       - name: Run Collection Pipeline
         run: |
-          python3 main.py
+          $env:PYTHONPATH='.'
+          python -m src.collector --mode recent --no-analyze
 
       - name: Generate Dashboard Data
         run: |
