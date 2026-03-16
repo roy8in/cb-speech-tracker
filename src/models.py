@@ -162,9 +162,22 @@ class SpeechDB:
         conn = self._get_conn()
         try:
             stats = {}
-            rows = conn.execute("SELECT bank_code, COUNT(*) as cnt FROM speeches GROUP BY bank_code").fetchall()
+            # Count per bank
+            rows = conn.execute("""
+                SELECT bank_code, 
+                       COUNT(*) as total,
+                       SUM(CASE WHEN full_text IS NOT NULL THEN 1 ELSE 0 END) as analyzed
+                FROM speeches 
+                GROUP BY bank_code
+            """).fetchall()
+            
             for r in rows:
-                stats[r['bank_code']] = r['cnt']
+                stats[r['bank_code']] = {
+                    'total_speeches': r['total'],
+                    'analyzed': r['analyzed']
+                }
+            
+            # Grand total
             total = conn.execute("SELECT COUNT(*) as cnt FROM speeches").fetchone()
             stats['total'] = total['cnt']
             return stats

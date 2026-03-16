@@ -46,10 +46,11 @@ def generate_data():
         threshold_date = (datetime.now() - timedelta(days=14)).strftime('%Y-%m-%d')
         recent_speeches = []
         rows = conn.execute("""
-            SELECT bank_code, speaker, title, date, url 
-            FROM speeches 
-            WHERE date >= ? 
-            ORDER BY date DESC, fetched_at DESC
+            SELECT s.bank_code, m.name as speaker, s.title, s.date, s.url 
+            FROM speeches s
+            LEFT JOIN members m ON s.speaker_id = m.id
+            WHERE s.date >= ? 
+            ORDER BY s.date DESC, s.fetched_at DESC
             LIMIT 50
         """, (threshold_date,)).fetchall()
         

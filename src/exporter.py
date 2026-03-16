@@ -45,17 +45,18 @@ class DataExporter:
         try:
             rows = conn.execute("""
                 SELECT
-                    bank,
-                    speaker,
-                    title,
-                    date,
-                    url,
-                    speech_type,
-                    language,
-                    full_text,
-                    fetched_at
-                FROM speeches
-                ORDER BY date DESC
+                    s.bank_code,
+                    m.name as speaker,
+                    s.title,
+                    s.date,
+                    s.url,
+                    s.speech_type,
+                    s.language,
+                    s.full_text,
+                    s.fetched_at
+                FROM speeches s
+                LEFT JOIN members m ON s.speaker_id = m.id
+                ORDER BY s.date DESC
             """).fetchall()
 
             output_path = self.output_dir / filename
@@ -67,7 +68,7 @@ class DataExporter:
                 ])
                 for row in rows:
                     writer.writerow([
-                        row['bank'], row['speaker'], row['title'], row['date'],
+                        row['bank_code'], row['speaker'], row['title'], row['date'],
                         row['url'], row['speech_type'], row['language'],
                         row['full_text'], row['fetched_at']
                     ])

@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-12T08:11:52.230992",
+  "last_updated": "2026-03-16T09:11:28.405372",
   "total_speeches": 2097,
   "bank_stats": {
     "FRB": 577,
@@ -10,6 +10,13 @@
     "BOC": 286
   },
   "recent_logs": [
+    {
+      "started_at": "2026-03-12T11:22:27.952387",
+      "finished_at": "2026-03-12T11:26:24.158664",
+      "status": "success",
+      "total_new": 0,
+      "error": null
+    },
     {
       "started_at": "2026-03-12T02:53:00.881263",
       "finished_at": "2026-03-12T03:21:21.869505",
@@ -151,28 +158,7 @@
       "title": "Getting the right directions − speech by Alan Taylor",
       "date": "2026-03-02",
       "url": "https://www.bankofengland.co.uk/speech/2026/march/speech-by-alan-taylor-getting-the-right-directions"
-    },
-    {
-      "bank": "BOC",
-      "speaker": null,
-      "title": "Bank of Canada issues revised compliance order to XTM Inc.",
-      "date": "2026-02-27",
-      "url": "https://www.bankofcanada.ca/2026/02/bank-of-canada-issues-revised-compliance-order-to-xtm-inc/"
-    },
-    {
-      "bank": "BOJ",
-      "speaker": "TAKATA Hajime",
-      "title": "\"Economic Activity, Prices, and Monetary Policy in Japan\" (Speech at a Meeting with Local Leaders in Kyoto)",
-      "date": "2026-02-26",
-      "url": "https://www.boj.or.jp/en/about/press/koen_2026/ko260226a.htm"
-    },
-    {
-      "bank": "FRB",
-      "speaker": "Bowman",
-      "title": "Supervision and Regulation",
-      "date": "2026-02-26",
-      "url": "https://www.federalreserve.gov/newsevents/speech/bowman20260226a.htm"
     }
   ],
-  "health": "partial"
+  "health": "success"
 }
