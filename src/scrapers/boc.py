@@ -28,7 +28,7 @@ class BOCScraper(BaseScraper):
         """
         all_speeches = []
         page = 1
-        max_pages = 50  # safety limit
+        max_pages = 300  # Increased limit to allow fetching back to 2008
 
         while page <= max_pages:
             url = self.SPEECHES_URL

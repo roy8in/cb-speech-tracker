@@ -25,7 +25,7 @@ class BaseScraper(ABC):
     BASE_URL = None   # Override: base URL of the speeches page
 
     # Polite scraping defaults
-    REQUEST_DELAY = 2.0  # seconds between requests
+    REQUEST_DELAY = 0.5  # seconds between requests (lowered for historical backfill)
     REQUEST_TIMEOUT = 30
     HEADERS = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',

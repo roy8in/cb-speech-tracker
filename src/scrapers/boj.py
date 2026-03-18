@@ -23,17 +23,14 @@ class BOJScraper(BaseScraper):
         
         resp = self._get(url)
         if not resp:
+            # Older archives might be under a different path or not exist, but we still try
             return []
 
         soup = self._parse_html(resp.text)
         speeches = []
 
-        # BOJ lists speeches in a section with class 'section' or 'main'
-        container = soup.find('div', id='main') or soup.find('div', class_='section')
-        if not container:
-            return []
-
-        for li in container.find_all('li'):
+        # Broaden search: look at all list items, filtering by URL pattern
+        for li in soup.find_all('li'):
             link = li.find('a', href=True)
             if not link:
                 continue
@@ -45,7 +42,8 @@ class BOJScraper(BaseScraper):
                 continue
 
             # BOJ speech links usually start with /en/about/press/koen_YYYY/
-            if '/koen_' not in href:
+            # but older ones might be slightly different. Look for 'koen' or 'press' + pdf/htm
+            if '/koen_' not in href and 'koen' not in href:
                 continue
 
             # Build absolute URL
