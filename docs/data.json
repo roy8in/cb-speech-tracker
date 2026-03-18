@@ -1,10 +1,10 @@
 {
-  "last_updated": "2026-03-16T00:22:47.324057",
-  "total_speeches": 2101,
+  "last_updated": "2026-03-18T04:58:15.695612",
+  "total_speeches": 2119,
   "bank_stats": {
     "FRB": 578,
-    "ECB": 225,
-    "BOE": 657,
+    "ECB": 242,
+    "BOE": 658,
     "BOJ": 213,
     "RBA": 142,
     "BOC": 286
@@ -116,69 +116,6 @@
       "title": "New players, old risks: Financial stability in a changing landscape",
       "date": "2026-03-04",
       "url": "https://www.bankofcanada.ca/2026/03/new-players-old-risks-financial-stability-in-a-changing-landscape/"
-    },
-    {
-      "bank": "RBA",
-      "speaker": "Michele Bullock",
-      "title": "Q&A Transcript",
-      "date": "2026-03-03",
-      "url": "https://www.rba.gov.au/speeches/2026/sp-gov-2026-03-03-q-and-a-transcript.html"
-    },
-    {
-      "bank": "RBA",
-      "speaker": "Michele Bullock",
-      "title": "Listening to Australians, Interpreting the Data and Setting Monetary Policy",
-      "date": "2026-03-03",
-      "url": "https://www.rba.gov.au/speeches/2026/sp-gov-2026-03-03.html"
-    },
-    {
-      "bank": "BOJ",
-      "speaker": "UEDA Kazuo",
-      "title": "\"The New Financial Ecosystem and the Role of Central Banks\" (Remarks at the FIN/SUM 2026)",
-      "date": "2026-03-03",
-      "url": "https://www.boj.or.jp/en/about/press/koen_2026/ko260303a.htm"
-    },
-    {
-      "bank": "FRB",
-      "speaker": "Bowman",
-      "title": "Liquidity Resiliency, Financial Stability, and the Role of the Federal Reserve",
-      "date": "2026-03-03",
-      "url": "https://www.federalreserve.gov/newsevents/speech/bowman20260303a.htm"
-    },
-    {
-      "bank": "BOC",
-      "speaker": "Sharon Kozicki",
-      "title": "Monetary policy in a turbulent world",
-      "date": "2026-03-02",
-      "url": "https://www.bankofcanada.ca/2026/03/monetary-policy-in-a-turbulent-world/"
-    },
-    {
-      "bank": "BOC",
-      "speaker": null,
-      "title": "Canada’s monetary policy framework in a world of supply-driven trade-offs",
-      "date": "2026-03-02",
-      "url": "https://www.bankofcanada.ca/2026/03/canadas-monetary-policy-framework-world-supply-driven-trade-offs/"
-    },
-    {
-      "bank": "RBA",
-      "speaker": "Sarah Hunter",
-      "title": "Recent Refinements to the Dual Mandate and Navigating Back to Target",
-      "date": "2026-03-02",
-      "url": "https://www.rba.gov.au/speeches/2026/sp-ag-2026-03-02.html"
-    },
-    {
-      "bank": "BOJ",
-      "speaker": "HIMINO Ryozo",
-      "title": "\"Japan's Economy and Monetary Policy\" (Speech at a Meeting with Local Leaders in Wakayama)",
-      "date": "2026-03-02",
-      "url": "https://www.boj.or.jp/en/about/press/koen_2026/ko260302a.htm"
-    },
-    {
-      "bank": "BOE",
-      "speaker": "Alan Taylor",
-      "title": "Getting the right directions − speech by Alan Taylor",
-      "date": "2026-03-02",
-      "url": "https://www.bankofengland.co.uk/speech/2026/march/speech-by-alan-taylor-getting-the-right-directions"
     }
   ],
   "health": "success"
