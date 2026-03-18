@@ -191,7 +191,15 @@ class BOCScraper(BaseScraper):
         if not resp:
             return None
 
-        soup = self._parse_html(resp.text)
+        content_type = resp.headers.get('Content-Type', '').lower()
+        if 'application/pdf' in content_type or url.lower().endswith('.pdf'):
+            return self.extract_pdf_text(resp.content)
+
+        try:
+            soup = self._parse_html(resp.text)
+        except Exception as e:
+            logger.warning(f"[{self.BANK_CODE}] Failed to parse HTML for {url}: {e}")
+            return None
 
         # Try multiple content selectors
         content = (

@@ -9,6 +9,7 @@ Note: RBA blocks direct requests to year subpages (403).
 import re
 import logging
 import time
+from datetime import datetime
 from playwright.sync_api import sync_playwright
 from .base import BaseScraper
 
@@ -38,7 +39,12 @@ class RBAScraper(BaseScraper):
 
     def fetch_speech_list(self, year=None):
         """Fetch list of RBA speeches using Playwright."""
-        url = f"{self.BASE_URL}/speeches/"
+        # For current year, it's /speeches/. For past years, it's /speeches/YYYY/
+        if year and str(year) != str(datetime.now().year):
+            url = f"{self.BASE_URL}/speeches/{year}/"
+        else:
+            url = f"{self.BASE_URL}/speeches/"
+            
         html = self._get_playwright(url)
         if not html:
             return []
@@ -108,6 +114,13 @@ class RBAScraper(BaseScraper):
 
     def fetch_speech_text(self, url):
         """Fetch the full text of an RBA speech."""
+        # Handle PDFs before passing to Playwright
+        if url.lower().endswith('.pdf'):
+            resp = self._get(url)
+            if resp:
+                return self.extract_pdf_text(resp.content)
+            return None
+            
         html = self._get_playwright(url)
         if not html: return None
         soup = self._parse_html(html)
@@ -129,11 +142,3 @@ class RBAScraper(BaseScraper):
                 return f"__SPEAKER__:{speaker}\n{text}"
             return text
         return None
-
-    def get_all_speeches(self, start_year=None, end_year=None):
-        all_speeches = self.fetch_speech_list()
-        if start_year:
-            all_speeches = [s for s in all_speeches if s['date'] >= f"{start_year}-01-01"]
-        if end_year:
-            all_speeches = [s for s in all_speeches if s['date'] <= f"{end_year}-12-31"]
-        return all_speeches

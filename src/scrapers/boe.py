@@ -109,7 +109,17 @@ class BOEScraper(BaseScraper):
         resp = self._get(url)
         if not resp:
             return None
-        soup = self._parse_html(resp.text)
+            
+        content_type = resp.headers.get('Content-Type', '').lower()
+        if 'application/pdf' in content_type or url.lower().endswith('.pdf'):
+            # Extract text directly from the PDF content
+            return self.extract_pdf_text(resp.content)
+            
+        try:
+            soup = self._parse_html(resp.text)
+        except Exception as e:
+            logger.warning(f"[{self.BANK_CODE}] Failed to parse HTML for {url}: {e}")
+            return None
         
         # Extract precise date
         # Pattern: Published on 12 March 2026

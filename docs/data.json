@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-03-18T22:48:12.134416",
-  "total_speeches": 2635,
+  "last_updated": "2026-03-18T17:54:43.775210",
+  "total_speeches": 2626,
   "bank_stats": {
     "FRB": 578,
     "ECB": 749,
     "BOE": 658,
-    "BOJ": 220,
+    "BOJ": 213,
     "RBA": 142,
-    "BOC": 288
+    "BOC": 286
   },
   "time_series_data": {
     "BOC": {
@@ -92,7 +92,7 @@
       "2025-12": 3,
       "2026-01": 1,
       "2026-02": 3,
-      "2026-03": 7
+      "2026-03": 5
     },
     "BOE": {
       "2019-01": 84,
@@ -254,7 +254,6 @@
       "2025-10": 4,
       "2025-11": 3,
       "2025-12": 2,
-      "2026-01": 7,
       "2026-02": 4,
       "2026-03": 2
     },
@@ -513,20 +512,6 @@
       "title": "Alan Taylor: Exante Data’s 10-year anniversary macro conference (to be published at 4pm GMT)",
       "date": "2026-03-26",
       "url": "https://www.bankofengland.co.uk/speech/2026/march/alan-taylor-exante-datas-10-year-anniversary-macro-conference"
-    },
-    {
-      "bank": "BOC",
-      "speaker": null,
-      "title": "Monetary Policy Decision Press Conference Opening Statement",
-      "date": "2026-03-18",
-      "url": "https://www.bankofcanada.ca/2026/03/opening-statement-2026-03-18/"
-    },
-    {
-      "bank": "BOC",
-      "speaker": null,
-      "title": "Bank of Canada maintains policy rate at 2¼%",
-      "date": "2026-03-18",
-      "url": "https://www.bankofcanada.ca/2026/03/fad-press-release-2026-03-18/"
     },
     {
       "bank": "BOE",

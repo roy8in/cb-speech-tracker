@@ -7,6 +7,7 @@ import requests
 import logging
 import time
 import urllib3
+import io
 from abc import ABC, abstractmethod
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -67,6 +68,39 @@ class BaseScraper(ABC):
     def _parse_html(self, html_text):
         """Parse HTML with BeautifulSoup."""
         return BeautifulSoup(html_text, 'html.parser')
+
+    def extract_pdf_text(self, pdf_bytes):
+        """Extract text from a PDF file using pdfplumber."""
+        try:
+            import pdfplumber
+        except ImportError:
+            logger.error("pdfplumber is not installed. Run: pip install pdfplumber")
+            return "Error: pdfplumber not installed. Cannot extract PDF text."
+
+        text_pages = []
+        try:
+            with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+                for page in pdf.pages:
+                    text = page.extract_text()
+                    if text:
+                        # Clean up common PDF issues: replace multiple spaces with one, 
+                        # but keep paragraph breaks (double newlines) if possible.
+                        # For simplicity, we just join pages here.
+                        text_pages.append(text)
+                        
+            full_text = "\n\n".join(text_pages).strip()
+            
+            # Basic cleanup: remove simple hyphenation at end of lines
+            import re
+            full_text = re.sub(r'(\w+)-\n([a-z]+)', r'\1\2', full_text)
+            
+            if not full_text or len(full_text) < 50:
+                return "This speech appears to be a scanned document or contains no extractable text."
+                
+            return full_text
+        except Exception as e:
+            logger.error(f"[{self.BANK_CODE}] Failed to parse PDF: {e}")
+            return "Error: Failed to extract text from this PDF document."
 
     @abstractmethod
     def fetch_speech_list(self, year=None):

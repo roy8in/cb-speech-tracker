@@ -9,7 +9,13 @@ env/
 venv/
 ENV/
 
-# Data (DB 파일은 프로젝트 목적상 포함하기로 했으므로 제외하지 않음)
+# Data
+src/data/*.db
+src/data/*.db-journal
+
+# Logs
+*.log
+
 # .env 파일 등 민감 정보
 .env
 
