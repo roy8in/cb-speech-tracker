@@ -95,6 +95,32 @@ class BaseScraper(ABC):
         """
         pass
 
+    def refresh_incomplete_speeches(self):
+        """Find and re-fetch speeches that were incomplete or placeholders."""
+        incomplete = self.db.get_incomplete_speeches(self.BANK_CODE)
+        if not incomplete:
+            return 0
+        
+        refreshed_count = 0
+        for item in incomplete:
+            logger.info(f"[{self.BANK_CODE}] Refreshing: {item['title']} ({item['url']})")
+            full_text = self.fetch_speech_text(item['url'])
+            
+            if full_text:
+                exact_date = None
+                if full_text.startswith("__DATE__:"):
+                    parts = full_text.split("\n", 1)
+                    exact_date = parts[0].replace("__DATE__:", "").strip()
+                    full_text = parts[1].strip() if len(parts) > 1 else ""
+
+                # Only update if we actually got real content now
+                if len(full_text) > 500 and "to be published" not in full_text.lower():
+                    self.db.update_speech_content(item['id'], full_text, exact_date)
+                    refreshed_count += 1
+                    logger.info(f"[{self.BANK_CODE}] Successfully refreshed ID {item['id']}")
+            
+        return refreshed_count
+
     def get_all_speeches(self, start_year=None, end_year=None):
         """
         Fetch ALL available speeches across all years.

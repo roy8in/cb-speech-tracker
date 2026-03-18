@@ -9,6 +9,7 @@ Tables:
 
 import sqlite3
 import os
+import json
 from datetime import datetime
 from pathlib import Path
 
@@ -59,12 +60,18 @@ class SpeechDB:
                     name TEXT NOT NULL,
                     role TEXT,
                     status TEXT DEFAULT 'active',
+                    term_start TEXT,
+                    term_end TEXT,
+                    last_speech_date TEXT,
+                    last_verified_at TEXT,
+                    last_updated TEXT DEFAULT (datetime('now')),
                     UNIQUE(bank_code, name)
                 );
 
                 CREATE INDEX IF NOT EXISTS idx_speeches_bank ON speeches(bank_code);
                 CREATE INDEX IF NOT EXISTS idx_speeches_date ON speeches(date);
                 CREATE INDEX IF NOT EXISTS idx_speeches_speaker ON speeches(speaker_id);
+                CREATE INDEX IF NOT EXISTS idx_members_status ON members(status);
 
                 -- 3. 수집 로그 테이블
                 CREATE TABLE IF NOT EXISTS collection_logs (
@@ -77,6 +84,9 @@ class SpeechDB:
                     total_new_speeches INTEGER DEFAULT 0
                 );
             """)
+            
+            # Migration for existing DBs
+            self._migrate_db(conn)
             
             # 2. FTS5 전문 검색 테이블 (SQLite FTS5 모듈 필요)
             try:
@@ -95,31 +105,118 @@ class SpeechDB:
                     END;
                 """)
             except sqlite3.OperationalError:
-                # FTS5가 지원되지 않는 환경일 경우 건너뜀
                 pass
                 
             conn.commit()
         finally:
             conn.close()
 
-    def get_or_create_member(self, bank_code, name):
-        """회원 ID를 반환하거나 없으면 생성"""
+    def _migrate_db(self, conn):
+        """Add missing columns to existing tables."""
+        cursor = conn.execute("PRAGMA table_info(members)")
+        columns = [row['name'] for row in cursor.fetchall()]
+        
+        new_cols = [
+            ('term_start', 'TEXT'),
+            ('term_end', 'TEXT'),
+            ('last_speech_date', 'TEXT'),
+            ('last_verified_at', 'TEXT'),
+            ('last_updated', "TEXT DEFAULT (datetime('now'))")
+        ]
+        
+        for col_name, col_type in new_cols:
+            if col_name not in columns:
+                try:
+                    conn.execute(f"ALTER TABLE members ADD COLUMN {col_name} {col_type}")
+                except sqlite3.OperationalError:
+                    pass
+
+    def get_or_create_member(self, bank_code, name, role=None, status='active'):
+        """회원 ID를 반환하거나 없으면 생성 (정보 업데이트 포함)"""
         if not name:
             return None
         conn = self._get_conn()
         try:
-            cursor = conn.execute("SELECT id FROM members WHERE bank_code = ? AND name = ?", (bank_code, name))
+            cursor = conn.execute("SELECT id, role, status FROM members WHERE bank_code = ? AND name = ?", (bank_code, name))
             row = cursor.fetchone()
             if row:
+                # Update role if provided and different
+                if (role and row['role'] != role) or (status != row['status']):
+                    conn.execute("""
+                        UPDATE members 
+                        SET role = COALESCE(?, role), status = ?, last_updated = datetime('now')
+                        WHERE id = ?
+                    """, (role, status, row['id']))
+                    conn.commit()
                 return row['id']
-            cursor = conn.execute("INSERT INTO members (bank_code, name) VALUES (?, ?)", (bank_code, name))
+            
+            cursor = conn.execute("""
+                INSERT INTO members (bank_code, name, role, status, last_updated) 
+                VALUES (?, ?, ?, ?, datetime('now'))
+            """, (bank_code, name, role, status))
             conn.commit()
             return cursor.lastrowid
         finally:
             conn.close()
 
+    def update_member_official(self, bank_code, name, **kwargs):
+        """공식 명단 확인 후 위원 정보 업데이트"""
+        conn = self._get_conn()
+        try:
+            kwargs['last_verified_at'] = datetime.now().strftime('%Y-%m-%d')
+            kwargs['last_updated'] = datetime.now().isoformat()
+            kwargs['status'] = 'active' # If they are in the official list, they are active
+            
+            # Build dynamic SQL
+            cols = []
+            vals = []
+            for k, v in kwargs.items():
+                cols.append(f"{k} = ?")
+                vals.append(v)
+            
+            sql = f"UPDATE members SET {', '.join(cols)} WHERE bank_code = ? AND name = ?"
+            vals.extend([bank_code, name])
+            
+            cursor = conn.execute(sql, vals)
+            if cursor.rowcount == 0:
+                # Member not in DB yet, create
+                cols = ['bank_code', 'name'] + list(kwargs.keys())
+                placeholders = ', '.join(['?'] * len(cols))
+                vals = [bank_code, name] + list(kwargs.values())
+                conn.execute(f"INSERT INTO members ({', '.join(cols)}) VALUES ({placeholders})", vals)
+            
+            conn.commit()
+        finally:
+            conn.close()
+
+    def mark_missing_members_retired(self, bank_code, current_member_names):
+        """공식 명단에 없는 위원을 'retired'로 변경"""
+        if not current_member_names:
+            return 0
+            
+        conn = self._get_conn()
+        try:
+            # Mark as retired if they were 'active' but not in the new list
+            placeholders = ', '.join(['?'] * len(current_member_names))
+            sql = f"""
+                UPDATE members 
+                SET status = 'retired', 
+                    term_end = COALESCE(term_end, date('now')),
+                    last_updated = datetime('now')
+                WHERE bank_code = ? 
+                AND status = 'active'
+                AND name NOT IN ({placeholders})
+            """
+            params = [bank_code] + list(current_member_names)
+            cursor = conn.execute(sql, params)
+            count = cursor.rowcount
+            conn.commit()
+            return count
+        finally:
+            conn.close()
+
     def insert_speech(self, bank_code, speaker, title, date, url, full_text=None, speech_type='speech', language='en'):
-        """새 연설 삽입 (URL 중복 시 무시)"""
+        """새 연설 삽입 및 위원의 마지막 연설일 갱신"""
         speaker_id = self.get_or_create_member(bank_code, speaker)
         conn = self._get_conn()
         try:
@@ -128,8 +225,50 @@ class SpeechDB:
                 (bank_code, speaker_id, title, date, url, full_text, speech_type, language, fetched_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (bank_code, speaker_id, title, date, url, full_text, speech_type, language, datetime.now().isoformat()))
+            
+            if cursor.rowcount > 0 and speaker_id:
+                # Update member's last speech date
+                conn.execute("""
+                    UPDATE members 
+                    SET last_speech_date = MAX(COALESCE(last_speech_date, ''), ?),
+                        last_updated = datetime('now')
+                    WHERE id = ?
+                """, (date, speaker_id))
+            
             conn.commit()
             return cursor.lastrowid if cursor.rowcount > 0 else None
+        finally:
+            conn.close()
+
+    def get_incomplete_speeches(self, bank_code=None):
+        """내용이 부실하거나 미래 날짜에 수집된 연설 목록 조회"""
+        conn = self._get_conn()
+        try:
+            query = """
+                SELECT id, url, title, date, fetched_at 
+                FROM speeches 
+                WHERE (full_text IS NULL OR length(full_text) < 500 OR full_text LIKE '%to be published%')
+                AND date <= date('now')
+            """
+            params = []
+            if bank_code:
+                query += " AND bank_code = ?"
+                params.append(bank_code)
+            
+            rows = conn.execute(query, params).fetchall()
+            return [dict(r) for r in rows]
+        finally:
+            conn.close()
+
+    def update_speech_content(self, speech_id, full_text, exact_date=None):
+        """연설 본문 및 날짜 업데이트"""
+        conn = self._get_conn()
+        try:
+            if exact_date:
+                conn.execute("UPDATE speeches SET full_text = ?, date = ? WHERE id = ?", (full_text, exact_date, speech_id))
+            else:
+                conn.execute("UPDATE speeches SET full_text = ? WHERE id = ?", (full_text, speech_id))
+            conn.commit()
         finally:
             conn.close()
 
@@ -166,7 +305,7 @@ class SpeechDB:
             rows = conn.execute("""
                 SELECT bank_code, 
                        COUNT(*) as total,
-                       SUM(CASE WHEN full_text IS NOT NULL THEN 1 ELSE 0 END) as analyzed
+                       SUM(CASE WHEN full_text IS NOT NULL AND length(full_text) > 500 THEN 1 ELSE 0 END) as analyzed
                 FROM speeches 
                 GROUP BY bank_code
             """).fetchall()

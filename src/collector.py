@@ -39,6 +39,7 @@ def run_collection(banks=None, mode='recent', analyze=True, start_year=None):
     target_banks = banks or list(ALL_SCRAPERS.keys())
 
     total_new = 0
+    total_refreshed = 0
     results = {}
 
     for bank_code in target_banks:
@@ -47,13 +48,20 @@ def run_collection(banks=None, mode='recent', analyze=True, start_year=None):
             continue
 
         logger.info(f"{'='*50}")
-        logger.info(f"Collecting: {bank_code}")
+        logger.info(f"Processing: {bank_code}")
         logger.info(f"{'='*50}")
 
         try:
             scraper_cls = ALL_SCRAPERS[bank_code]
             scraper = scraper_cls(db=db)
 
+            # 1. Refresh incomplete speeches (like placeholders)
+            refreshed = scraper.refresh_incomplete_speeches()
+            total_refreshed += refreshed
+            if refreshed > 0:
+                logger.info(f"[{bank_code}] Refreshed {refreshed} incomplete speeches")
+
+            # 2. Collect new speeches
             if mode == 'full':
                 new_count = scraper.collect_new_speeches(
                     start_year=start_year,
@@ -64,14 +72,25 @@ def run_collection(banks=None, mode='recent', analyze=True, start_year=None):
 
             results[bank_code] = new_count
             total_new += new_count
-            logger.info(f"[{bank_code}] {new_count} new speeches")
+            logger.info(f"[{bank_code}] {new_count} new speeches added")
 
         except Exception as e:
-            logger.error(f"[{bank_code}] Collection failed: {e}")
+            logger.error(f"[{bank_code}] Pipeline failed: {e}")
             results[bank_code] = -1
+            
+    # 3. Apply activity-based member status cleanup globally after collection
+    try:
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        from scripts.apply_activity_status import apply_activity_based_status
+        logger.info("Running activity-based member cleanup...")
+        apply_activity_based_status(days_threshold=365)
+    except Exception as e:
+        logger.error(f"Failed to run activity status update: {e}")
 
-    # Run analysis on new speeches
-    if analyze and total_new > 0:
+    # Run analysis on new or refreshed speeches
+    if analyze and (total_new > 0 or total_refreshed > 0):
         try:
             from .analyzer import HawkDoveAnalyzer
             analyzer = HawkDoveAnalyzer(db=db)
@@ -90,6 +109,7 @@ def run_collection(banks=None, mode='recent', analyze=True, start_year=None):
         status = f"{count} new" if count >= 0 else "FAILED"
         logger.info(f"  {bank}: {status}")
     logger.info(f"  Total new: {total_new}")
+    logger.info(f"  Total refreshed: {total_refreshed}")
 
     # Print overall stats
     stats = db.get_stats()
