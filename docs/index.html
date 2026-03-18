@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CB Speech Tracker | Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-color: #0f1117;
@@ -81,7 +82,7 @@
             margin-bottom: 2rem;
         }
 
-        h2 { font-size: 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+        h2 { font-size: 1rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
 
         .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         .data-table th { text-align: left; padding: 0.75rem; color: var(--text-dim); border-bottom: 1px solid var(--border-color); font-weight: 600; }
@@ -108,6 +109,23 @@
 
         footer { text-align: center; color: var(--text-dim); font-size: 0.7rem; margin-top: 2rem; }
 
+        select {
+            background: var(--bg-color);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
         @media (max-width: 1000px) {
             .grid-stats { grid-template-columns: repeat(4, 1fr); }
         }
@@ -127,6 +145,24 @@
         </header>
 
         <div class="grid-stats" id="bank-stats-grid"></div>
+        
+        <section>
+            <h2>
+                <span>📈 Speech Frequency over Time</span>
+                <select id="bank-selector">
+                    <option value="ALL">All Banks</option>
+                    <option value="FRB">FRB 🇺🇸</option>
+                    <option value="ECB">ECB 🇪🇺</option>
+                    <option value="BOE">BOE 🇬🇧</option>
+                    <option value="BOJ">BOJ 🇯🇵</option>
+                    <option value="RBA">RBA 🇦🇺</option>
+                    <option value="BOC">BOC 🇨🇦</option>
+                </select>
+            </h2>
+            <div class="chart-container">
+                <canvas id="speechChart"></canvas>
+            </div>
+        </section>
 
         <section>
             <h2>📋 Recent Collection Logs</h2>
@@ -173,6 +209,107 @@
             'BOC': '🇨🇦'
         };
 
+        const BANK_COLORS = {
+            'FRB': '#3b82f6', // Blue
+            'ECB': '#f59e0b', // Yellow
+            'BOE': '#ef4444', // Red
+            'BOJ': '#10b981', // Green
+            'RBA': '#8b5cf6', // Indigo
+            'BOC': '#ec4899', // Pink
+        };
+
+        let chartInstance = null;
+        let globalTimeData = null;
+
+        function updateChart(selectedBank) {
+            if (!globalTimeData) return;
+            
+            const ctx = document.getElementById('speechChart').getContext('2d');
+            
+            // Collect all unique months across all banks and sort them
+            let allMonths = new Set();
+            Object.values(globalTimeData).forEach(bankData => {
+                Object.keys(bankData).forEach(month => allMonths.add(month));
+            });
+            const labels = Array.from(allMonths).sort();
+            
+            let datasets = [];
+            
+            if (selectedBank === 'ALL') {
+                Object.entries(globalTimeData).forEach(([bank, data]) => {
+                    datasets.push({
+                        label: bank,
+                        data: labels.map(m => data[m] || 0),
+                        borderColor: BANK_COLORS[bank],
+                        backgroundColor: BANK_COLORS[bank] + '33',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 1,
+                        pointHoverRadius: 5
+                    });
+                });
+            } else {
+                const data = globalTimeData[selectedBank] || {};
+                datasets.push({
+                    label: selectedBank,
+                    data: labels.map(m => data[m] || 0),
+                    borderColor: BANK_COLORS[selectedBank],
+                    backgroundColor: BANK_COLORS[selectedBank] + '33',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 2,
+                    pointHoverRadius: 6
+                });
+            }
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            Chart.defaults.color = '#94a3b8';
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            display: selectedBank === 'ALL',
+                            position: 'top',
+                        },
+                        tooltip: {
+                            backgroundColor: '#1a1d27',
+                            titleColor: '#e2e8f0',
+                            bodyColor: '#e2e8f0',
+                            borderColor: '#2d333f',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#2d333f', drawBorder: false },
+                            ticks: { maxTicksLimit: 12 }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#2d333f', drawBorder: false },
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+        }
+
         async function loadData() {
             try {
                 const response = await fetch('data.json?t=' + Date.now());
@@ -194,6 +331,12 @@
                 });
                 statsGrid.innerHTML = statsHtml;
 
+                // Handle Time Series Data
+                globalTimeData = data.time_series_data;
+                const selector = document.getElementById('bank-selector');
+                updateChart(selector.value);
+                selector.onchange = (e) => updateChart(e.target.value);
+
                 document.getElementById('log-body').innerHTML = data.recent_logs.map(log => `
                     <tr>
                         <td>${new Date(log.started_at).toLocaleDateString()}</td>
@@ -202,20 +345,20 @@
                         <td style="font-size: 0.7rem; color: var(--text-dim);">${log.error || 'Normal'}</td>
                     </tr>
                 `).join('');
-// 4. Recent Speeches
-const speechBody = document.getElementById('speech-body');
-if (data.recent_speeches && data.recent_speeches.length > 0) {
-    speechBody.innerHTML = data.recent_speeches.map(s => `
-        <tr>
-            <td><span class="bank-badge">${BANK_FLAGS[s.bank] || ''} ${s.bank}</span></td>
-            <td style="font-weight: 600; color: ${s.speaker ? 'var(--text-main)' : 'var(--text-dim)'};">
-                ${s.speaker || 'Central Bank'}
-            </td>
-            <td><a href="${s.url}" target="_blank" class="speech-link">${s.title}</a></td>
-            <td class="col-date">${s.date}</td>
-        </tr>
-    `).join('');
-} else {
+
+                const speechBody = document.getElementById('speech-body');
+                if (data.recent_speeches && data.recent_speeches.length > 0) {
+                    speechBody.innerHTML = data.recent_speeches.map(s => `
+                        <tr>
+                            <td><span class="bank-badge">${BANK_FLAGS[s.bank] || ''} ${s.bank}</span></td>
+                            <td style="font-weight: 600; color: ${s.speaker ? 'var(--text-main)' : 'var(--text-dim)'};">
+                                ${s.speaker || 'Central Bank'}
+                            </td>
+                            <td><a href="${s.url}" target="_blank" class="speech-link">${s.title}</a></td>
+                            <td class="col-date">${s.date}</td>
+                        </tr>
+                    `).join('');
+                } else {
                     speechBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-dim); padding: 2rem;">No recent speeches found.</td></tr>';
                 }
 
@@ -223,6 +366,7 @@ if (data.recent_speeches && data.recent_speeches.length > 0) {
                 console.error('Error:', error);
             }
         }
+        
         loadData();
         setInterval(loadData, 300000);
     </script>
