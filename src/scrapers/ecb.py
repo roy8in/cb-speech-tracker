@@ -118,7 +118,7 @@ class ECBScraper(BaseScraper):
         Override: ECB CSV includes full text, so we handle differently.
         """
         existing_urls = self.db.get_existing_urls(self.BANK_CODE)
-        speech_list = self.fetch_speech_list(year=start_year)
+        speech_list = self.get_all_speeches(start_year=start_year)
 
         new_count = 0
         for speech_info in speech_list:
