@@ -18,6 +18,23 @@ class FRBScraper(BaseScraper):
     BANK_CODE = 'FRB'
     BANK_NAME = 'Federal Reserve'
     BASE_URL = 'https://www.federalreserve.gov'
+    
+    SPEAKER_MAP = {
+        'Barr': 'Michael S. Barr',
+        'Bowman': 'Michelle W. Bowman',
+        'Brainard': 'Lael Brainard',
+        'Clarida': 'Richard H. Clarida',
+        'Cook': 'Lisa D. Cook',
+        'Jefferson': 'Philip N. Jefferson',
+        'Kugler': 'Adriana D. Kugler',
+        'Miran': 'Stephen I. Miran',
+        'Powell': 'Jerome H. Powell',
+        'Quarles': 'Randal K. Quarles',
+        'Waller': 'Christopher J. Waller',
+        'Yellen': 'Janet L. Yellen',
+        'Bernanke': 'Ben S. Bernanke',
+        'Tarullo': 'Daniel K. Tarullo',
+    }
 
     def _get_year_url(self, year):
         """Get the correct URL for a given year's speech list."""
@@ -88,6 +105,9 @@ class FRBScraper(BaseScraper):
                     if m:
                         speaker = m.group(1)
                         break
+
+            if speaker and speaker in self.SPEAKER_MAP:
+                speaker = self.SPEAKER_MAP[speaker]
 
             speeches.append({
                 'title': title,
