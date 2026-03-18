@@ -31,8 +31,9 @@ jobs:
           playwright install chromium
 
       - name: Run Collection Pipeline
+        env:
+          PYTHONPATH: .
         run: |
-          $env:PYTHONPATH='.'
           python -m src.collector --mode recent --no-analyze
 
       - name: Generate Dashboard Data
