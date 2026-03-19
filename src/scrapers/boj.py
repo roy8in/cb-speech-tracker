@@ -29,9 +29,9 @@ class BOJScraper(BaseScraper):
         soup = self._parse_html(resp.text)
         speeches = []
 
-        # Broaden search: look at all list items, filtering by URL pattern
-        for li in soup.find_all('li'):
-            link = li.find('a', href=True)
+        # Broaden search: look at all list items and table cells
+        for container in soup.find_all(['li', 'td']):
+            link = container.find('a', href=True)
             if not link:
                 continue
 
@@ -46,12 +46,22 @@ class BOJScraper(BaseScraper):
             if '/koen_' not in href and 'koen' not in href:
                 continue
 
+            # Skip index/navigation links
+            if href.endswith('index.htm') or 'r_menu' in href:
+                continue
+
             # Build absolute URL
             speech_url = f"{self.BASE_URL}{href}" if href.startswith('/') else href
 
-            # Extract date from the list item text (e.g., "Mar.  3, 2026")
-            date_text = li.get_text(strip=True)
+            # Extract date: in modern <li> it's in the li text. In older <td>, it might be in the previous sibling <td> or same td
+            date_text = container.get_text(strip=True)
             date = self._parse_boj_date(date_text)
+            
+            if not date and container.name == 'td':
+                # Check previous sibling for date in table layouts
+                prev = container.find_previous_sibling('td')
+                if prev:
+                    date = self._parse_boj_date(prev.get_text(strip=True))
             
             # Extract speaker from title parentheses if present
             speaker = None
@@ -67,7 +77,15 @@ class BOJScraper(BaseScraper):
                 'speaker': speaker,
             })
 
-        return speeches
+        # Deduplicate
+        seen = set()
+        unique = []
+        for s in speeches:
+            if s['url'] not in seen:
+                seen.add(s['url'])
+                unique.append(s)
+
+        return unique
 
     def _parse_boj_date(self, text):
         """Parse BOJ date format (e.g., 'Mar. 3, 2026')."""
